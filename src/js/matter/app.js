@@ -3,7 +3,8 @@ import _ from 'lodash'
 import { engine } from './engine'
 import CanvasRender from './canvas-render'
 import Blob from './blob'
-import Dish from './dish';
+import Dish from './dish'
+import SVGRender from './svg-render'
 
 class MatterApp {
   constructor(wrapper, numBlobs) {
@@ -15,6 +16,7 @@ class MatterApp {
     this.numBlobs = numBlobs
     this.blobs = []
     this.overblob = -1
+    this.svgRenders = []
   }
 
   init() {
@@ -24,10 +26,7 @@ class MatterApp {
     this.createBlobs()
 
     this.addEventListeners()
-
-    Matter.Engine.run(this.engine)
-    Matter.Render.run(this.canvasRender.render)
-    
+  
     let mouseConstraint = Matter.MouseConstraint.create(this.engine, {
       mouse: this.mouse,
       constraint: {
@@ -39,6 +38,9 @@ class MatterApp {
     })
     Matter.World.add(this.engine.world, mouseConstraint)
     this.canvasRender.render.mouse = this.mouse
+
+    Matter.Engine.run(this.engine)
+    Matter.Render.run(this.canvasRender.render)
   }
 
   createDish() {
@@ -52,15 +54,26 @@ class MatterApp {
       y: this.canvasRender.render.canvas.height * 0.5
     }
 
+    let blobSegments = 12
+    let sinAngle = Math.sin(Math.PI * 2 / blobSegments)
+
+    let svgWrapper = document.getElementById('svg-wrapper')
+
     for (let i = 0; i < this.numBlobs; i++) {
       let angle = i / this.numBlobs * Math.PI * 2
       let position = Matter.Vector.create(center.x + Math.cos(angle) * 100, center.y + Math.sin(angle) * 100)
 
-      let blob = new Blob(position, 12, 12, 48)
+      let randomRadius = Math.random() * 40 + 24
+      let size = sinAngle * randomRadius * 0.5
+      let blob = new Blob(position, blobSegments, size, randomRadius)
       blob.init()
       blob.addToWorld(engine.world)
 
+      let svgRender = new SVGRender(svgWrapper, blob, i)
+      svgRender.init()
+
       this.blobs.push(blob)
+      this.svgRenders.push(svgRender)
     }
   }
 
@@ -72,17 +85,6 @@ class MatterApp {
       this.dish.moveTo(wrapperCenter)
     }, 200))
        
-    window.addEventListener('keypress', (event) => {
-      event.preventDefault()
-    
-      if (event.key == 'z') {
-        //blob.grow()
-      }
-      if (event.key == 'x') {
-        //blob.shrink()
-      }
-    })
-
     window.addEventListener('mousemove', _.throttle((event) => {
       let distance = 99999
       let index = 0
@@ -105,6 +107,18 @@ class MatterApp {
     
       this.overblob = blobIndex
     }, 200))
+  }
+
+  update() {
+    this.blobs.forEach(blob => {
+      
+    })
+  }
+
+  draw() {
+    this.svgRenders.forEach(svgRender => {
+      svgRender.draw()
+    })
   }
 }
 

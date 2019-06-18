@@ -12,6 +12,8 @@ class Blob {
     this.num = num
     this.size = size
     this.radius = radius
+    this.currSize = size*0.2
+    this.currRadius = radius*0.2
     this.bodies = []
     this.springs = []
   }
@@ -26,13 +28,13 @@ class Blob {
     for (let i = 0; i < this.num; i++) {
       let angle = i / this.num * Math.PI * 2
       let offset = {
-        x: Math.cos(angle) * this.radius,
-        y: Math.sin(angle) * this.radius
+        x: Math.cos(angle) * this.currRadius,
+        y: Math.sin(angle) * this.currRadius
       }
 
       let x = this.position.x + offset.x
       let y = this.position.y + offset.y
-      let circle = Matter.Bodies.circle(x, y, this.size, frictionOptions)
+      let circle = Matter.Bodies.circle(x, y, this.currSize, frictionOptions)
 
       this.bodies.push(circle)
     }
@@ -106,12 +108,11 @@ class Blob {
     })
   }
 
-  grow() {
+  grow(incr) {
     this.bodies.forEach((body) => {
-      Matter.Body.scale(body, 1.1, 1.1)
+      Matter.Body.scale(body, incr, incr)
     })
     this.springs.forEach((spring) => {
-      let incr = Math.random() * 0.1 + 1.1
       spring.constraint.length = spring.constraint.length * incr;
     })
   }
