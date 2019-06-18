@@ -7,9 +7,8 @@ let Smoothed = function (current, dest, smoothing)
 }
 
 class Blob {
-  constructor(x, y, num, size, radius) {
-    this.x = x
-    this.y = y
+  constructor(position, num, size, radius) {
+    this.position = position
     this.num = num
     this.size = size
     this.radius = radius
@@ -31,8 +30,8 @@ class Blob {
         y: Math.sin(angle) * this.radius
       }
 
-      let x = this.x + offset.x
-      let y = this.y + offset.y
+      let x = this.position.x + offset.x
+      let y = this.position.y + offset.y
       let circle = Matter.Bodies.circle(x, y, this.size, frictionOptions)
 
       this.bodies.push(circle)
