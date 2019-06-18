@@ -12,8 +12,8 @@ class Blob {
     this.num = num
     this.size = size
     this.radius = radius
-    this.currSize = size*0.2
-    this.currRadius = radius*0.2
+    this.currSize = size*0.5
+    this.currRadius = radius*0.5
     this.bodies = []
     this.springs = []
   }
@@ -50,7 +50,7 @@ class Blob {
       let constraintAB = Matter.Constraint.create({
         bodyA: bodyA,
         bodyB: bodyB,
-        stiffness: 0.01,
+        stiffness: 0.1,
         damping: 0.1,
         render: {
           type: 'line'
@@ -61,7 +61,7 @@ class Blob {
         bodyA: bodyA,
         bodyB: bodyC,
         stiffness: 0.01,
-        damping: 0.001,
+        damping: 0.01,
         render: {
           type: 'line'
         }
@@ -109,11 +109,15 @@ class Blob {
   }
 
   grow(incr) {
+    this.currSize *= incr
+    this.currRadius *= incr
+
+    this.springs.forEach((spring) => {
+      let sprincr = Math.random() * (incr - 1) * 0.1 + incr
+      spring.constraint.length = spring.constraint.length * sprincr;
+    })
     this.bodies.forEach((body) => {
       Matter.Body.scale(body, incr, incr)
-    })
-    this.springs.forEach((spring) => {
-      spring.constraint.length = spring.constraint.length * incr;
     })
   }
 

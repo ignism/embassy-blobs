@@ -5,6 +5,7 @@ import CanvasRender from './canvas-render'
 import Blob from './blob'
 import Dish from './dish'
 import SVGRender from './svg-render'
+import { Z_BLOCK } from 'zlib';
 
 class MatterApp {
   constructor(wrapper, numBlobs) {
@@ -59,11 +60,13 @@ class MatterApp {
 
     let svgWrapper = document.getElementById('svg-wrapper')
 
+    let radius = this.dish.radius / 2
+
     for (let i = 0; i < this.numBlobs; i++) {
       let angle = i / this.numBlobs * Math.PI * 2
-      let position = Matter.Vector.create(center.x + Math.cos(angle) * 100, center.y + Math.sin(angle) * 100)
+      let position = Matter.Vector.create(center.x + Math.cos(angle) * radius, center.y + Math.sin(angle) * radius)
 
-      let randomRadius = Math.random() * 40 + 24
+      let randomRadius = Math.random() * 80 + 40
       let size = sinAngle * randomRadius * 0.5
       let blob = new Blob(position, blobSegments, size, randomRadius)
       blob.init()
@@ -111,7 +114,7 @@ class MatterApp {
 
   update() {
     this.blobs.forEach(blob => {
-      
+      if (blob.currSize < blob.size - 0.001) blob.grow(1.005)
     })
   }
 

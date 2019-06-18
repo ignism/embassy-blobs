@@ -59,6 +59,8 @@ class SVGRender {
     points += ' ' + center.x + ' ' + center.y + ' '
 
     let path = this.element.getElementById('path')
+    
+    path.setAttribute('stroke-width', this.blob.currSize * 1.5)
     path.setAttribute('d', points)
   }
 }
