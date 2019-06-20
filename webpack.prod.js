@@ -4,6 +4,7 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 const TerserPlugin = require('terser-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const common = require('./webpack.common.js')
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
 process.env.NODE_ENV = 'production'
 
@@ -16,6 +17,6 @@ module.exports = merge(common, {
   ],
 
   optimization: {
-    minimizer: [new TerserPlugin()],
+    minimizer: [new UglifyJsPlugin()],
   },
 })

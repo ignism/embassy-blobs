@@ -1,47 +1,41 @@
 import Matter from 'matter-js'
-import _ from 'lodash'
+import { throttle } from 'lodash-es'
 import { engine } from './engine'
 import CanvasRender from './canvas-render'
 import Blob from './blob'
 import Dish from './dish'
 import SVGRender from './svg-render'
-import { Z_BLOCK } from 'zlib';
 
 class MatterApp {
-  constructor(wrapper, numBlobs) {
+  constructor(wrapper, numBlobs, debug = false) {
     this.wrapper = wrapper
-    this.engine = engine
-    this.canvasRender = new CanvasRender(wrapper, engine)
-    this.mouse = Matter.Mouse.create(this.canvasRender.render.canvas)
-    this.dish = new Dish(wrapper.clientWidth * 0.5, wrapper.clientHeight * 0.5, 24, 240)
+    this.mouse = Matter.Vector.create()
+    this.dishDestination = Matter.Vector.create(
+      wrapper.clientWidth * 0.5,
+      wrapper.clientHeight * 0.5
+    )
+    this.dish = new Dish(this.dishDestination, 48, 240)
     this.numBlobs = numBlobs
     this.blobs = []
     this.overblob = -1
     this.svgRenders = []
+    this.debug = debug
+
+    if (debug) {
+      this.canvasRender = new CanvasRender(document.getElementById('blob-debug'), engine)
+    }
   }
 
   init() {
-    this.canvasRender.init()
+    if (this.debug) {
+      this.canvasRender.init()
+      Matter.Render.run(this.canvasRender.render)
+    } 
 
     this.createDish()
     this.createBlobs()
 
     this.addEventListeners()
-  
-    let mouseConstraint = Matter.MouseConstraint.create(this.engine, {
-      mouse: this.mouse,
-      constraint: {
-        stiffness: 0.009,
-        render: {
-          visible: true
-        }
-      }
-    })
-    Matter.World.add(this.engine.world, mouseConstraint)
-    this.canvasRender.render.mouse = this.mouse
-
-    Matter.Engine.run(this.engine)
-    Matter.Render.run(this.canvasRender.render)
   }
 
   createDish() {
@@ -51,22 +45,25 @@ class MatterApp {
 
   createBlobs() {
     let center = {
-      x: this.canvasRender.render.canvas.width * 0.5,
-      y: this.canvasRender.render.canvas.height * 0.5
+      x: this.wrapper.clientWidth * 0.5,
+      y: this.wrapper.clientHeight * 0.5
     }
 
     let blobSegments = 12
     let sinAngle = Math.sin(Math.PI * 2 / blobSegments)
 
-    let svgWrapper = document.getElementById('svg-wrapper')
+    let svgWrapper = this.wrapper.querySelector('#svg-wrapper')
 
     let radius = this.dish.radius / 2
 
     for (let i = 0; i < this.numBlobs; i++) {
       let angle = i / this.numBlobs * Math.PI * 2
-      let position = Matter.Vector.create(center.x + Math.cos(angle) * radius, center.y + Math.sin(angle) * radius)
+      let position = Matter.Vector.create(
+        center.x + Math.cos(angle) * radius,
+        center.y + Math.sin(angle) * radius
+      )
 
-      let randomRadius = Math.random() * 80 + 40
+      let randomRadius = Math.random() * 20 + 60
       let size = sinAngle * randomRadius * 0.5
       let blob = new Blob(position, blobSegments, size, randomRadius)
       blob.init()
@@ -81,45 +78,84 @@ class MatterApp {
   }
 
   addEventListeners() {
-    window.addEventListener('resize', _.throttle(event => {
-      this.canvasRender.resize()
-      
-      let wrapperCenter = Matter.Vector.create(this.wrapper.clientWidth * 0.5, this.wrapper.clientHeight * 0.5)
-      this.dish.moveTo(wrapperCenter)
-    }, 200))
-       
-    window.addEventListener('mousemove', _.throttle((event) => {
-      let distance = 99999
-      let index = 0
-      let blobIndex = -1
+    window.addEventListener(
+      'resize',
+      throttle((event) => {
+        this.canvasRender.resize()
 
-      this.blobs.forEach(blob => {
-        let distBlob = Matter.Vector.magnitude(
-          Matter.Vector.sub(this.mouse.position, blob.getCenter())
+        let wrapperCenter = Matter.Vector.create(
+          this.wrapper.clientWidth * 0.5,
+          this.wrapper.clientHeight * 0.5
         )
-      
-        if (distBlob < distance) {
-          distance = distBlob
-          if (distance < blob.radius) {
+
+        this.dishDestination = wrapperCenter
+      }, 200)
+    )
+
+    window.addEventListener(
+      'mousemove',
+      throttle((event) => {
+        let distance = 99999
+        let index = 0
+        let blobIndex = -1
+
+        this.mouse.x = Math.max(0, event.clientX - window.innerWidth * 0.5)
+        this.mouse.y = event.clientY
+
+        this.blobs.forEach((blob) => {
+          let distBlob = Matter.Vector.magnitude(
+            Matter.Vector.sub(this.mouse, blob.getCenter())
+          )
+
+          if (distBlob < distance) {
+            distance = distBlob
             blobIndex = index
           }
-        }
 
-        index++
-      })
-    
-      this.overblob = blobIndex
-    }, 200))
+          index++
+        })
+
+        if (this.blobs[blobIndex].isInside(this.mouse)) {
+          if (this.overblob == -1) {
+            if (this.blobs[blobIndex].state != 0) {
+              this.blobs[blobIndex].scale(1.5)
+              this.blobs[blobIndex].isMouseOver = true
+            }
+          } else if (this.overblob != blobIndex) {
+            this.blobs[blobIndex].scale(1.5)
+            this.blobs[blobIndex].isMouseOver = true
+
+            this.blobs[this.overblob].reset()
+          }
+          this.overblob = blobIndex
+        } else {
+          if (this.overblob > -1) {
+            if (this.blobs[blobIndex].state != 0)
+              this.blobs[this.overblob].reset()
+          }
+          this.overblob = -1
+        }
+      }, 20)
+    )
   }
 
   update() {
-    this.blobs.forEach(blob => {
-      if (blob.currSize < blob.size - 0.001) blob.grow(1.005)
+    let offset = Matter.Vector.sub(this.dishDestination, this.dish.position)
+    if (Matter.Vector.magnitude(offset) > 4) {
+      let norm = Matter.Vector.mult(Matter.Vector.normalise(offset), 4)
+      let newPosition = Matter.Vector.add(this.dish.position, norm)
+      this.dish.moveTo(newPosition)
+    }
+
+    this.blobs.forEach((blob) => {
+      blob.update()
     })
+
+    Matter.Engine.update(engine)
   }
 
   draw() {
-    this.svgRenders.forEach(svgRender => {
+    this.svgRenders.forEach((svgRender) => {
       svgRender.draw()
     })
   }

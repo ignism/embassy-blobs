@@ -1,9 +1,9 @@
 import Matter from 'matter-js'
+import inside from 'point-in-polygon'
 
-let Smoothed = function (current, dest, smoothing)
-{
-    let step = (dest - current) / (dest * smoothing)
-    return current + step
+let Smoothed = function(current, dest, smoothing) {
+  let step = (dest - current) / (dest * smoothing)
+  return current + step
 }
 
 class Blob {
@@ -12,13 +12,18 @@ class Blob {
     this.num = num
     this.size = size
     this.radius = radius
-    this.currSize = size*0.5
-    this.currRadius = radius*0.5
+    this.currScale = 0.5
+    this.destScale = 1
     this.bodies = []
     this.springs = []
+    this.state = 0
   }
 
   init() {
+    this.currScale = 0.5
+    let initSize = this.size * this.currScale
+    let initRadius = this.radius * this.currScale
+
     let frictionOptions = {
       friction: 0.1,
       frictionAir: 0.5,
@@ -28,13 +33,13 @@ class Blob {
     for (let i = 0; i < this.num; i++) {
       let angle = i / this.num * Math.PI * 2
       let offset = {
-        x: Math.cos(angle) * this.currRadius,
-        y: Math.sin(angle) * this.currRadius
+        x: Math.cos(angle) * initRadius,
+        y: Math.sin(angle) * initRadius
       }
 
       let x = this.position.x + offset.x
       let y = this.position.y + offset.y
-      let circle = Matter.Bodies.circle(x, y, this.currSize, frictionOptions)
+      let circle = Matter.Bodies.circle(x, y, initSize, frictionOptions)
 
       this.bodies.push(circle)
     }
@@ -50,8 +55,8 @@ class Blob {
       let constraintAB = Matter.Constraint.create({
         bodyA: bodyA,
         bodyB: bodyB,
-        stiffness: 0.1,
-        damping: 0.1,
+        stiffness: 0.01,
+        damping: 0.5,
         render: {
           type: 'line'
         }
@@ -61,7 +66,7 @@ class Blob {
         bodyA: bodyA,
         bodyB: bodyC,
         stiffness: 0.01,
-        damping: 0.01,
+        damping: 0.5,
         render: {
           type: 'line'
         }
@@ -70,13 +75,15 @@ class Blob {
       let springAB = {
         constraint: constraintAB,
         restLength: constraintAB.length,
-        growLength: constraintAB.length * 10
+        currLength: constraintAB.length,
+        destLength: constraintAB.length
       }
 
       let springAC = {
         constraint: constraintAC,
         restLength: constraintAC.length,
-        growLength: constraintAC.length * 10
+        currLength: constraintAC.length,
+        destLength: constraintAC.length
       }
 
       this.springs.push(springAB)
@@ -84,10 +91,78 @@ class Blob {
     }
   }
 
+  update() {
+    switch (this.state) {
+      case 0:
+        // init state
+        if (this.currScale < 1) {
+          this.grow()
+        } else {
+          this.springs.forEach((spring) => {
+            spring.restLength = spring.constraint.length
+          })
+          this.state++
+        }
+        break
+      case 1:
+        // rest state
+        break
+      case 10:
+        if (this.currScale < 1) {
+          this.state = 20
+        } else if (this.currScale > 1) {
+          this.state = 21
+        } else {
+          this.state = 1
+        }
+        break
+      case 20:
+        // grow state
+        if (this.currScale < this.destScale) {
+          this.grow()
+
+          if (this.isMouseOver) {
+            console.log('applying force')
+            this.addForce(this.getCenter())
+          }
+        } else if (this.isMouseOver) {
+            console.log('applying force')
+            this.addForce(this.getCenter())
+        } else {
+          this.state = 1
+        }
+        break
+      case 21:
+        // shrink state
+        if (this.currScale > this.destScale) {
+          this.shrink()
+        } else {
+          this.state = 1
+        }
+        break
+    }
+  }
+
+  scale(multiplier) {
+    this.destScale = multiplier
+
+    if (this.destScale > this.currScale) {
+      this.state = 20
+    } else if (this.destScale < this.currScale) {
+      this.state = 21
+    }
+  }
+
+  reset() {
+    this.destScale = 1
+    this.isMouseOver = false
+    this.state = 10
+  }
+
   getCenter() {
     let center = Matter.Vector.create()
 
-    this.bodies.forEach(body => {
+    this.bodies.forEach((body) => {
       center.x += body.position.x
       center.y += body.position.y
     })
@@ -108,27 +183,47 @@ class Blob {
     })
   }
 
-  grow(incr) {
-    this.currSize *= incr
-    this.currRadius *= incr
+  grow() {
+    let amount = 1.009
+    this.currScale *= amount
 
     this.springs.forEach((spring) => {
-      let sprincr = Math.random() * (incr - 1) * 0.1 + incr
-      spring.constraint.length = spring.constraint.length * sprincr;
+      spring.constraint.length *= amount
     })
     this.bodies.forEach((body) => {
-      Matter.Body.scale(body, incr, incr)
+      Matter.Body.scale(body, amount, amount)
     })
   }
 
   shrink() {
-    this.bodies.forEach((body) => {
-      Matter.Body.scale(body, 1/1.1, 1/1.1)
-    })
+    let amount = 1 / 1.005
+    this.currScale *= amount
+
     this.springs.forEach((spring) => {
-      let decr = Math.random() * 0.1 + 1.1
-      spring.constraint.length = spring.constraint.length / decr;
+      spring.constraint.length *= amount
     })
+    this.bodies.forEach((body) => {
+      Matter.Body.scale(body, amount, amount)
+    })
+  }
+
+  addForce(point) {
+    this.bodies.forEach(body => {
+      let distance = Matter.Vector.sub(body.position, point)
+      let force = Matter.Vector.mult(Matter.Vector.normalise(distance), 0.002)
+      Matter.Body.applyForce(body, Matter.Vector.create(), force)
+    })
+  }
+
+  isInside(vector) {
+    let polygon = []
+
+    this.bodies.forEach((body) => {
+      let position = [body.position.x, body.position.y]
+      polygon.push(position)
+    })
+
+    return inside([vector.x, vector.y], polygon)
   }
 }
 

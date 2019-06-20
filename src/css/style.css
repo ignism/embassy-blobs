@@ -2,15 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
-#matter-app {
+#blob-debug {
+  position: relative;
+  width: 50%;
+  height: 100vh;
+}
+#blob-app {
+  position: relative;
   width: 50%;
   height: 100vh;
 }
 
 #svg-wrapper {
-  position: relative;
-  width: 50%;
-  height: 100vh;
+  position: absolute;
+  width: 100%;
+  height: 100%;
   background: #aaa;
 }
 

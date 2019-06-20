@@ -1,9 +1,8 @@
-import Matter from 'matter-js'
+import Matter from 'matter-js/build/matter.min.js'
 
 class Dish {
-  constructor(x, y, num, radius) {
-    this.x = x
-    this.y = y
+  constructor(position, num, radius) {
+    this.position = position
     this.num = num
     this.radius = radius
     this.bodies = []
@@ -22,9 +21,9 @@ class Dish {
         x: Math.cos(angle) * this.radius,
         y: Math.sin(angle) * this.radius
       }
-      let x = this.x + offset.x
-      let y = this.y + offset.y
-      let rectangle = Matter.Bodies.rectangle(x, y, w, 10, { angle: angle + Math.PI / 2, isStatic: true })
+      let x = this.position.x + offset.x
+      let y = this.position.y + offset.y
+      let rectangle = Matter.Bodies.rectangle(x, y, w, 1, { angle: angle + Math.PI / 2, isStatic: true })
 
       this.bodies.push(rectangle)
     }
@@ -51,6 +50,8 @@ class Dish {
       let newPosition = Matter.Vector.add(body.position, offset)
       Matter.Body.setPosition(body, newPosition)
     })
+
+    this.position = this.getCenter()
   }
 
   addToWorld(world) {

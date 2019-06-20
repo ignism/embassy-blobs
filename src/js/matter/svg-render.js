@@ -1,4 +1,4 @@
-import Matter from 'matter-js'
+import Matter from 'matter-js/build/matter.min.js'
 
 class SVGRender {
   constructor(wrapper, blob, index) {
@@ -60,7 +60,7 @@ class SVGRender {
 
     let path = this.element.getElementById('path')
     
-    path.setAttribute('stroke-width', this.blob.currSize * 1.5)
+    path.setAttribute('stroke-width', (this.blob.size * this.blob.currScale) * 1.5)
     path.setAttribute('d', points)
   }
 }

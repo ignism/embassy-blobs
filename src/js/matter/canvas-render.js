@@ -1,5 +1,4 @@
-import Matter from 'matter-js'
-import _ from 'lodash'
+import Matter from 'matter-js/build/matter.min.js'
 
 // let element = document.getElementById('matter-app')
 // const render = Matter.Render.create({ element: element, engine: engine })

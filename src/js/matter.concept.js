@@ -1,4 +1,4 @@
-import Matter from 'matter-js'
+import Matter from 'matter-js/build/matter.min.js'
 // module aliases
 let Engine = Matter.Engine,
   Render = Matter.Render,
@@ -192,7 +192,6 @@ Render.run(render)
 
 //-----------------------------------------//
 
-let polygon = document.getElementById('blob').querySelector('polygon')
 let path = document.getElementById('blob').querySelector('#path')
 
 function renderToSVG() {
