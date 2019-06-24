@@ -1,7 +1,7 @@
 import MatterApp from './app'
 
 const wrapper = document.getElementById('blob-app')
-const matterApp = new MatterApp(wrapper, 6, true)
+const matterApp = new MatterApp(wrapper, 4, true)
 
 matterApp.init()
 

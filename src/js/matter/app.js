@@ -14,7 +14,8 @@ class MatterApp {
       wrapper.clientWidth * 0.5,
       wrapper.clientHeight * 0.5
     )
-    this.dish = new Dish(this.dishDestination, 48, 240)
+    this.dish = new Dish(this.dishDestination, 24, 240)
+    this.dishOuter = new Dish(this.dishDestination, 24, 260)
     this.numBlobs = numBlobs
     this.blobs = []
     this.overblob = -1
@@ -41,6 +42,8 @@ class MatterApp {
   createDish() {
     this.dish.init()
     this.dish.addToWorld(engine.world)
+    this.dishOuter.init()
+    this.dishOuter.addToWorld(engine.world)
   }
 
   createBlobs() {
@@ -54,18 +57,21 @@ class MatterApp {
 
     let svgWrapper = this.wrapper.querySelector('#svg-wrapper')
 
-    let radius = this.dish.radius / 2
+    let placementRadius = this.dish.radius / 2
+
+    let blobRadi = [80, 72, 48, 24]
 
     for (let i = 0; i < this.numBlobs; i++) {
       let angle = i / this.numBlobs * Math.PI * 2
       let position = Matter.Vector.create(
-        center.x + Math.cos(angle) * radius,
-        center.y + Math.sin(angle) * radius
+        center.x + Math.cos(angle) * placementRadius,
+        center.y + Math.sin(angle) * placementRadius
       )
 
-      let randomRadius = Math.random() * 20 + 60
-      let size = sinAngle * randomRadius * 0.5
-      let blob = new Blob(position, blobSegments, size, randomRadius)
+      // let randomRadius = Math.random() * 20 + 60
+      let blobRadius = blobRadi[i % blobRadi.length] * 1.25
+      let size = sinAngle * blobRadius * 0.5
+      let blob = new Blob(position, blobSegments, size, blobRadius)
       blob.init()
       blob.addToWorld(engine.world)
 

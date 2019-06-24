@@ -26,13 +26,13 @@ class Blob {
     let initRadius = this.radius * this.currScale
 
     let frictionOptions = {
-      friction: 0.1,
-      frictionAir: 0.5,
+      friction: 0.01,
+      frictionAir: 0.01,
       frictionStatic: 0.01
     }
 
     let constraintOptions = {
-      stiffness: 0.05,
+      stiffness: 0.025,
       damping: 0.5
     }
 
@@ -80,6 +80,16 @@ class Blob {
         }
       })
 
+      let constraintAnchorA = Matter.Constraint.create({
+        bodyA: this.anchor,
+        bodyB: bodyA,
+        stiffness: constraintOptions.stiffness,
+        damping: constraintOptions.damping,
+        render: {
+          type: 'line'
+        }
+      })
+
       let springAB = {
         constraint: constraintAB,
         restLength: constraintAB.length,
@@ -94,8 +104,16 @@ class Blob {
         destLength: constraintAC.length
       }
 
+      let springAnchorA = {
+        constraint: constraintAnchorA,
+        restLength: constraintAnchorA.length,
+        currLength: constraintAnchorA.length,
+        destLength: constraintAnchorA.length
+      }
+
       this.springs.push(springAB)
       this.springs.push(springAC)
+      this.springs.push(springAnchorA)
     }
   }
 
@@ -203,6 +221,8 @@ class Blob {
     this.bodies.forEach((body) => {
       Matter.Body.scale(body, amount, amount)
     })
+
+    Matter.Body.scale(this.anchor, amount, amount)
   }
 
   shrink() {
@@ -215,9 +235,11 @@ class Blob {
     this.bodies.forEach((body) => {
       Matter.Body.scale(body, amount, amount)
     })
+    Matter.Body.scale(this.anchor, amount, amount)
   }
 
   addForce(point) {
+    return 
     this.bodies.forEach(body => {
       let distance = Matter.Vector.sub(body.position, point)
       let force = Matter.Vector.mult(Matter.Vector.normalise(distance), 0.002)
