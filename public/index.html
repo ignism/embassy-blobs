@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,20 +8,30 @@
   <title>Document</title>
   <link rel="stylesheet" href="css/bundle.css">
 </head>
+
 <body>
 
   <div class="flex flex-wrap">
-    <div id="blob-debug">
-    </div>
+    <div id="blob-debug"></div>
     <div id="blob-app">
       <div id="svg-wrapper">
-          <svg id="blob-model" class="blob-element" height="100%" width="100%">
-            <path id="path" d="" style="fill:black;stroke:black;" stroke-width="20" stroke-linejoin="round"/>
-          </svg>
+        <svg id="blob-model" class="blob-element" height="100%" width="100%">
+          <clipPath id="clip-path">
+            <!-- <path d="M22.154,108.389 L258.274,13.5 L449.156,151.421 L487.774,429.469 L211.933,472.5 L30.981,366.577 L22.154,108.389 z"> -->
+            <path id="path" d=""/>
+            <!-- <polygon points="130,0 0,160 0,485 270,645 560,485 560,160" /> -->
+          </clipPath>
+          
+          <!-- <path id="path" d="" style="fill:black;stroke:black;" stroke-width="20" stroke-linejoin="round"/> -->
+          <image clip-path="url(#clip-path)" 
+          xlink:href=""
+          height="100%" width="100%" class="svg__image">
+        </svg>
       </div>
     </div>
   </div>
 
   <script src="js/bundle.js?v=0.1"></script>
 </body>
+
 </html>

@@ -1,4 +1,4 @@
-import Matter from 'matter-js/build/matter.min.js'
+import Matter from 'matter-js'
 
 class SVGRender {
   constructor(wrapper, blob, index) {
@@ -8,6 +8,10 @@ class SVGRender {
     let model = document.getElementById('blob-model')
     let element = model.cloneNode(true)
     element.setAttribute('id', 'blob-element-' + index)
+    element.querySelector('clipPath').setAttribute('id', 'clip-path-' + index)
+    let image  = element.querySelector('image')
+    image.setAttribute('clip-path', 'url(#clip-path-' + index + ')')
+    image.setAttribute('xlink:href', 'images/pattern' + index + '.png')
     this.element = element
     wrapper.appendChild(this.element)
   }
@@ -17,50 +21,49 @@ class SVGRender {
   }
 
   draw() {
+    let center = this.blob.getCenter()
+    let size = this.blob.size * this.blob.currScale
+
     let v1 = Matter.Vector.create(
       this.blob.bodies[0].position.x,
       this.blob.bodies[0].position.y
     )
+    let offset = Matter.Vector.mult(Matter.Vector.normalise(Matter.Vector.sub(v1, center)), size)
+    v1 = Matter.Vector.add(v1, offset)
+
     let v2 = Matter.Vector.create(
       this.blob.bodies[1].position.x,
       this.blob.bodies[1].position.y
     )
-    let center = Matter.Vector.mult(Matter.Vector.add(v1, v2), 0.5)
+    offset = Matter.Vector.mult(Matter.Vector.normalise(Matter.Vector.sub(v2, center)), size)
+    v2 = Matter.Vector.add(v2, offset)
 
-    let points = 'M' + center.x + ' ' + center.y + ' '
+    let between = Matter.Vector.mult(Matter.Vector.add(v1, v2), 0.5)
+
+    let points = 'M' + between.x + ' ' + between.y + ' '
 
     v1 = v2
+    
+    for (let i = 2; i < this.blob.bodies.length + 2; i++) {
+      let index = i % this.blob.bodies.length
 
-    for (let i = 2; i < this.blob.bodies.length; i++) {
       v2 = Matter.Vector.create(
-        this.blob.bodies[i].position.x,
-        this.blob.bodies[i].position.y
+        this.blob.bodies[index].position.x,
+        this.blob.bodies[index].position.y
       )
-      center = Matter.Vector.mult(Matter.Vector.add(v1, v2), 0.5)
+      offset = Matter.Vector.mult(Matter.Vector.normalise(Matter.Vector.sub(v2, center)), size)
+      v2 = Matter.Vector.add(v2, offset)
+
+      between = Matter.Vector.mult(Matter.Vector.add(v1, v2), 0.5)
 
       points += 'Q' + v1.x + ' ' + v1.y
-      points += ' ' + center.x + ' ' + center.y + ' '
+      points += ' ' + between.x + ' ' + between.y + ' '
 
       v1 = v2
     }
 
-    v2 = Matter.Vector.create(this.blob.bodies[0].position.x, this.blob.bodies[0].position.y)
-    center = Matter.Vector.mult(Matter.Vector.add(v1, v2), 0.5)
-
-    points += 'Q' + v1.x + ' ' + v1.y
-    points += ' ' + center.x + ' ' + center.y + ' '
-
-    v1 = v2
-
-    v2 = Matter.Vector.create(this.blob.bodies[1].position.x, this.blob.bodies[1].position.y)
-    center = Matter.Vector.mult(Matter.Vector.add(v1, v2), 0.5)
-
-    points += 'Q' + v1.x + ' ' + v1.y
-    points += ' ' + center.x + ' ' + center.y + ' '
-
     let path = this.element.getElementById('path')
     
-    path.setAttribute('stroke-width', (this.blob.size * this.blob.currScale) * 1.5)
     path.setAttribute('d', points)
   }
 }
