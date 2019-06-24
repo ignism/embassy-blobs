@@ -31,6 +31,11 @@ class Blob {
       frictionStatic: 0.01
     }
 
+    let constraintOptions = {
+      stiffness: 0.05,
+      damping: 0.5
+    }
+
     this.anchor = Matter.Bodies.circle(this.position.x, this.position.y, initSize, frictionOptions)
 
     for (let i = 0; i < this.num; i++) {
@@ -58,8 +63,8 @@ class Blob {
       let constraintAB = Matter.Constraint.create({
         bodyA: bodyA,
         bodyB: bodyB,
-        stiffness: 0.01,
-        damping: 0.5,
+        stiffness: constraintOptions.stiffness,
+        damping: constraintOptions.damping,
         render: {
           type: 'line'
         }
@@ -68,8 +73,8 @@ class Blob {
       let constraintAC = Matter.Constraint.create({
         bodyA: bodyA,
         bodyB: bodyC,
-        stiffness: 0.01,
-        damping: 0.5,
+        stiffness: constraintOptions.stiffness,
+        damping: constraintOptions.damping,
         render: {
           type: 'line'
         }
