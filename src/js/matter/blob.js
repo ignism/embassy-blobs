@@ -17,6 +17,7 @@ class Blob {
     this.bodies = []
     this.springs = []
     this.state = 0
+    this.anchor
   }
 
   init() {
@@ -29,6 +30,8 @@ class Blob {
       frictionAir: 0.5,
       frictionStatic: 0.01
     }
+
+    this.anchor = Matter.Bodies.circle(this.position.x, this.position.y, initSize, frictionOptions)
 
     for (let i = 0; i < this.num; i++) {
       let angle = i / this.num * Math.PI * 2
@@ -181,6 +184,8 @@ class Blob {
     this.springs.forEach((spring) => {
       Matter.World.add(world, spring.constraint)
     })
+
+    Matter.World.add(world, this.anchor)
   }
 
   grow() {
