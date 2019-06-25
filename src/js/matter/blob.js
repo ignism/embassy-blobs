@@ -13,7 +13,7 @@ class Blob {
     this.size = size
     this.radius = radius
     this.currScale = 0.5
-    this.destScale = radius / 24
+    this.destScale = 1
     this.restScale = radius / 24
     this.bodies = []
     this.springs = []
@@ -94,28 +94,34 @@ class Blob {
       let springAB = {
         constraint: constraintAB,
         restLength: constraintAB.length,
-        currLength: constraintAB.length,
-        destLength: constraintAB.length
       }
 
       let springAC = {
         constraint: constraintAC,
         restLength: constraintAC.length,
-        currLength: constraintAC.length,
-        destLength: constraintAC.length
       }
 
       let springAnchorA = {
         constraint: constraintAnchorA,
         restLength: constraintAnchorA.length,
-        currLength: constraintAnchorA.length,
-        destLength: constraintAnchorA.length
       }
 
       this.springs.push(springAB)
       this.springs.push(springAC)
       this.springs.push(springAnchorA)
     }
+  }
+
+  addToWorld(world) {
+    this.bodies.forEach((body) => {
+      Matter.World.add(world, body)
+    })
+
+    this.springs.forEach((spring) => {
+      Matter.World.add(world, spring.constraint)
+    })
+
+    Matter.World.add(world, this.anchor)
   }
 
   update() {
@@ -135,13 +141,17 @@ class Blob {
         // rest state
         break
       case 10:
+        // reset state
         this.destScale = this.restScale
         
-        if (this.currScale < this.restScale) {
-          this.state = 20
-        } else if (this.currScale > this.restScale) {
-          this.state = 21
+        if (this.currScale < this.destScale) {
+          this.grow()
+        } else if (this.currScale > this.destScale) {
+          this.shrink()
         } else {
+          this.springs.forEach((spring) => {
+            spring.constraint.length = spring.restLength
+          })
           this.state = 1
         }
         break
@@ -149,14 +159,6 @@ class Blob {
         // grow state
         if (this.currScale < this.destScale) {
           this.grow()
-
-          if (this.isMouseOver) {
-            console.log('applying force')
-            this.addForce(this.getCenter())
-          }
-        } else if (this.isMouseOver) {
-            console.log('applying force')
-            this.addForce(this.getCenter())
         } else {
           this.state = 1
         }
@@ -169,16 +171,6 @@ class Blob {
           this.state = 1
         }
         break
-    }
-  }
-
-  scale(multiplier) {
-    this.destScale = multiplier
-
-    if (this.destScale > this.currScale) {
-      this.state = 20
-    } else if (this.destScale < this.currScale) {
-      this.state = 21
     }
   }
 
@@ -202,55 +194,48 @@ class Blob {
     return center
   }
 
-  addToWorld(world) {
-    this.bodies.forEach((body) => {
-      Matter.World.add(world, body)
-    })
+  scaleTo(multiplier) {
+    this.destScale = multiplier
+
+    if (this.destScale > this.currScale) {
+      this.state = 20
+    } else if (this.destScale < this.currScale) {
+      this.state = 21
+    }
+  }
+
+  scale(amount) {
+    this.currScale *= amount
 
     this.springs.forEach((spring) => {
-      Matter.World.add(world, spring.constraint)
+      spring.constraint.length *= amount
+    })
+    this.bodies.forEach((body) => {
+      Matter.Body.scale(body, amount, amount)
     })
 
-    Matter.World.add(world, this.anchor)
+    Matter.Body.scale(this.anchor, amount, amount)
   }
 
   grow() {
     let amount = 1.01
-    this.currScale *= amount
-
-    this.springs.forEach((spring) => {
-      spring.constraint.length *= amount
-    })
-    this.bodies.forEach((body) => {
-      Matter.Body.scale(body, amount, amount)
-    })
-
-    Matter.Body.scale(this.anchor, amount, amount)
+    this.scale(amount)
   }
 
   shrink() {
     let amount = 1 / 1.01
-    this.currScale *= amount
-
-    this.springs.forEach((spring) => {
-      spring.constraint.length *= amount
-    })
-    this.bodies.forEach((body) => {
-      Matter.Body.scale(body, amount, amount)
-    })
-    Matter.Body.scale(this.anchor, amount, amount)
+    this.scale(amount)
   }
 
-  addForce(point) {
-    return 
+  addForce(point, strength = 0.002) {
     this.bodies.forEach(body => {
       let distance = Matter.Vector.sub(body.position, point)
-      let force = Matter.Vector.mult(Matter.Vector.normalise(distance), 0.002)
+      let force = Matter.Vector.mult(Matter.Vector.normalise(distance), strength)
       Matter.Body.applyForce(body, Matter.Vector.create(), force)
     })
   }
 
-  isInside(vector) {
+  isInside(point) {
     let polygon = []
 
     this.bodies.forEach((body) => {
@@ -258,7 +243,7 @@ class Blob {
       polygon.push(position)
     })
 
-    return inside([vector.x, vector.y], polygon)
+    return inside([point.x, point.y], polygon)
   }
 }
 
