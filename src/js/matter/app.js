@@ -10,20 +10,24 @@ class MatterApp {
   constructor(wrapper, numBlobs, debug = false) {
     this.wrapper = wrapper
     this.mouse = Matter.Vector.create()
-    this.dishDestination = Matter.Vector.create(
+    this.wrapperCenter = Matter.Vector.create(
       wrapper.clientWidth * 0.5,
       wrapper.clientHeight * 0.5
     )
-    this.dish = new Dish(this.dishDestination, 24, 240)
-    this.dishOuter = new Dish(this.dishDestination, 24, 260)
+    this.dish = new Dish(this.wrapperCenter, 24, 240)
+    this.dishOuter = new Dish(this.wrapperCenter, 24, 260)
     this.numBlobs = numBlobs
     this.blobs = []
     this.overblob = -1
     this.svgRenders = []
     this.debug = debug
+    this.initialized = false
 
     if (debug) {
-      this.canvasRender = new CanvasRender(document.getElementById('blob-debug'), engine)
+      this.canvasRender = new CanvasRender(
+        document.getElementById('blob-debug'),
+        engine
+      )
     }
   }
 
@@ -31,7 +35,7 @@ class MatterApp {
     if (this.debug) {
       this.canvasRender.init()
       Matter.Render.run(this.canvasRender.render)
-    } 
+    }
 
     this.createDish()
     this.createBlobs()
@@ -94,7 +98,7 @@ class MatterApp {
           this.wrapper.clientHeight * 0.5
         )
 
-        this.dishDestination = wrapperCenter
+        this.wrapperCenter = wrapperCenter
       }, 200)
     )
 
@@ -131,7 +135,7 @@ class MatterApp {
             this.blobs[blobIndex].scaleTo(6)
             this.blobs[blobIndex].isMouseOver = true
 
-            this.blobs[this.overblob].reset() 
+            this.blobs[this.overblob].reset()
           }
           this.overblob = blobIndex
         } else {
@@ -146,16 +150,29 @@ class MatterApp {
   }
 
   update() {
-    let offset = Matter.Vector.sub(this.dishDestination, this.dish.position)
+    let offset = Matter.Vector.sub(this.wrapperCenter, this.dish.position)
     if (Matter.Vector.magnitude(offset) > 4) {
       let norm = Matter.Vector.mult(Matter.Vector.normalise(offset), 4)
       let newPosition = Matter.Vector.add(this.dish.position, norm)
       this.dish.moveTo(newPosition)
     }
 
-    this.blobs.forEach((blob) => {
-      blob.update()
-    })
+    if (this.initialized) {
+      this.blobs.forEach((blob) => {
+        blob.addMovement(this.wrapperCenter, 0.0002)
+        blob.update()
+      })
+    } else {
+      let initialized = true
+      this.blobs.forEach((blob) => {
+        if (blob.state != 1) {
+          initialized = false
+        }
+        blob.update()
+      })
+      this.initialized = initialized
+    }
+
 
     Matter.Engine.update(engine)
   }

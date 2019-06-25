@@ -84,7 +84,7 @@ class Blob {
       let constraintAnchorA = Matter.Constraint.create({
         bodyA: this.anchor,
         bodyB: bodyA,
-        stiffness: constraintOptions.stiffness,
+        stiffness: constraintOptions.stiffness * 2,
         damping: constraintOptions.damping,
         render: {
           type: 'line'
@@ -233,6 +233,20 @@ class Blob {
       let force = Matter.Vector.mult(Matter.Vector.normalise(distance), strength)
       Matter.Body.applyForce(body, Matter.Vector.create(), force)
     })
+  }
+
+  addMovement(center, strength, debug = false) {
+    let norm = Matter.Vector.normalise(
+      Matter.Vector.sub(center, this.anchor.position)
+    )
+    let perpendicular = Matter.Vector.rotate(norm, Math.PI * 0.5 * ((Math.random() - 0.5) * 0.1 + 1))
+    let force = Matter.Vector.mult(perpendicular, strength * this.currScale)
+
+    if (debug) {
+      // console.log(force)
+    }
+
+    Matter.Body.applyForce(this.anchor, this.anchor.position, force)
   }
 
   isInside(point) {
