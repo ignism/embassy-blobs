@@ -124,11 +124,11 @@ class MatterApp {
         if (this.blobs[blobIndex].isInside(this.mouse)) {
           if (this.overblob == -1) {
             if (this.blobs[blobIndex].state != 0) {
-              this.blobs[blobIndex].scale(6)
+              this.blobs[blobIndex].scaleTo(6)
               this.blobs[blobIndex].isMouseOver = true
             }
           } else if (this.overblob != blobIndex) {
-            this.blobs[blobIndex].scale(6)
+            this.blobs[blobIndex].scaleTo(6)
             this.blobs[blobIndex].isMouseOver = true
 
             this.blobs[this.overblob].reset() 
