@@ -71,7 +71,7 @@ class MatterApp {
       // let randomRadius = Math.random() * 20 + 60
       let blobRadius = blobRadi[i % blobRadi.length] * 1.25
       let size = sinAngle * blobRadius * 0.5
-      let blob = new Blob(position, blobSegments, size, blobRadius)
+      let blob = new Blob(position, blobSegments, 6, blobRadius)
       blob.init()
       blob.addToWorld(engine.world)
 
@@ -124,14 +124,14 @@ class MatterApp {
         if (this.blobs[blobIndex].isInside(this.mouse)) {
           if (this.overblob == -1) {
             if (this.blobs[blobIndex].state != 0) {
-              this.blobs[blobIndex].scale(1.5)
+              this.blobs[blobIndex].scale(6)
               this.blobs[blobIndex].isMouseOver = true
             }
           } else if (this.overblob != blobIndex) {
-            this.blobs[blobIndex].scale(1.5)
+            this.blobs[blobIndex].scale(6)
             this.blobs[blobIndex].isMouseOver = true
 
-            this.blobs[this.overblob].reset()
+            this.blobs[this.overblob].reset() 
           }
           this.overblob = blobIndex
         } else {
