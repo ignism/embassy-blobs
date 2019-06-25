@@ -13,7 +13,8 @@ class Blob {
     this.size = size
     this.radius = radius
     this.currScale = 0.5
-    this.destScale = 1
+    this.destScale = radius / 24
+    this.restScale = radius / 24
     this.bodies = []
     this.springs = []
     this.state = 0
@@ -22,8 +23,8 @@ class Blob {
 
   init() {
     this.currScale = 0.5
-    let initSize = this.size * this.currScale
-    let initRadius = this.radius * this.currScale
+    let initSize = 6 * this.currScale
+    let initRadius = 24 * this.currScale
 
     let frictionOptions = {
       friction: 0.01,
@@ -121,7 +122,7 @@ class Blob {
     switch (this.state) {
       case 0:
         // init state
-        if (this.currScale < 1) {
+        if (this.currScale < this.restScale) {
           this.grow()
         } else {
           this.springs.forEach((spring) => {
@@ -134,9 +135,11 @@ class Blob {
         // rest state
         break
       case 10:
-        if (this.currScale < 1) {
+        this.destScale = this.restScale
+        
+        if (this.currScale < this.restScale) {
           this.state = 20
-        } else if (this.currScale > 1) {
+        } else if (this.currScale > this.restScale) {
           this.state = 21
         } else {
           this.state = 1
@@ -212,7 +215,7 @@ class Blob {
   }
 
   grow() {
-    let amount = 1.009
+    let amount = 1.01
     this.currScale *= amount
 
     this.springs.forEach((spring) => {
@@ -226,7 +229,7 @@ class Blob {
   }
 
   shrink() {
-    let amount = 1 / 1.005
+    let amount = 1 / 1.01
     this.currScale *= amount
 
     this.springs.forEach((spring) => {
