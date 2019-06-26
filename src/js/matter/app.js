@@ -5,6 +5,7 @@ import CanvasRender from './canvas-render'
 import Blob from './blob'
 import Dish from './dish'
 import SVGRender from './svg-render'
+import tumult from 'tumult'
 
 class MatterApp {
   constructor(wrapper, numBlobs, debug = false) {
@@ -22,6 +23,8 @@ class MatterApp {
     this.svgRenders = []
     this.debug = debug
     this.initialized = false
+    this.noise = new tumult.Simplex1('seed')
+    this.ticker = 0
 
     if (debug) {
       this.canvasRender = new CanvasRender(
@@ -39,7 +42,6 @@ class MatterApp {
 
     this.createDish()
     this.createBlobs()
-
     this.addEventListeners()
   }
 
@@ -158,8 +160,17 @@ class MatterApp {
     }
 
     if (this.initialized) {
+      // this.ticker++
+      // if (this.ticker > 100) { 
+      //   this.ticker = 0
+      //   let index = Math.floor(Math.random() * 4)
+      //   this.blobs[index].scaleTo((Math.random() + 0.5) * this.blobs[index].restScale)
+      // }
+      
+      let strength = 0.0002
+
       this.blobs.forEach((blob) => {
-        blob.addMovement(this.wrapperCenter, 0.0002)
+        blob.addMovement(this.wrapperCenter, strength)
         blob.update()
       })
     } else {
