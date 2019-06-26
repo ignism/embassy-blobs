@@ -224,12 +224,12 @@ class Blob {
   }
 
   grow() {
-    let amount = 1.025
+    let amount = 1.0075
     this.scale(amount)
   }
 
   shrink() {
-    let amount = 1 / 1.025
+    let amount = 1 / 1.0075
     this.scale(amount)
   }
 

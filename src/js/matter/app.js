@@ -26,6 +26,8 @@ class MatterApp {
     this.noise = new tumult.Simplex1('seed')
     this.ticker = 0
     this.isScaling = false
+    this.triggers
+    this.currentScaledBlob = -1
 
     if (debug) {
       this.canvasRender = new CanvasRender(
@@ -43,6 +45,7 @@ class MatterApp {
 
     this.createDish()
     this.createBlobs()
+    this.createTriggers()
     this.addEventListeners()
   }
 
@@ -87,6 +90,14 @@ class MatterApp {
 
       this.blobs.push(blob)
       this.svgRenders.push(svgRender)
+    }
+  }
+
+  createTriggers() {
+    let triggerInterface = document.getElementById('blob-interface')
+
+    if (triggerInterface) {
+      this.triggers = Array.from(triggerInterface.querySelectorAll('.blob-trigger'))
     }
   }
 
@@ -158,6 +169,17 @@ class MatterApp {
         }
       }, 20)
     )
+
+    this.triggers.forEach(trigger => {
+      trigger.addEventListener('mouseenter', event => {
+        let index = Math.floor(Math.random() * 4)
+        while (index == this.currentScaledBlob) {
+          index = Math.floor(Math.random() * 4)
+        }
+        this.scaleBlob(index, 6)
+        this.currentScaledBlob = index
+      })
+    })
   }
 
   update() {
