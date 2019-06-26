@@ -29,14 +29,14 @@ class SVGRender {
       this.blob.bodies[0].position.y
     )
     let offset = Matter.Vector.mult(Matter.Vector.normalise(Matter.Vector.sub(v1, center)), size)
-    v1 = Matter.Vector.add(v1, offset)
+    v1 = this.pixelPerfect(Matter.Vector.add(v1, offset))
 
     let v2 = Matter.Vector.create(
       this.blob.bodies[1].position.x,
       this.blob.bodies[1].position.y
     )
     offset = Matter.Vector.mult(Matter.Vector.normalise(Matter.Vector.sub(v2, center)), size)
-    v2 = Matter.Vector.add(v2, offset)
+    v2 = this.pixelPerfect(Matter.Vector.add(v2, offset))
 
     let between = Matter.Vector.mult(Matter.Vector.add(v1, v2), 0.5)
 
@@ -52,9 +52,9 @@ class SVGRender {
         this.blob.bodies[index].position.y
       )
       offset = Matter.Vector.mult(Matter.Vector.normalise(Matter.Vector.sub(v2, center)), size)
-      v2 = Matter.Vector.add(v2, offset)
+      v2 = this.pixelPerfect(Matter.Vector.add(v2, offset))
 
-      between = Matter.Vector.mult(Matter.Vector.add(v1, v2), 0.5)
+      between = this.pixelPerfect(Matter.Vector.mult(Matter.Vector.add(v1, v2), 0.5))
 
       points += 'Q' + v1.x + ' ' + v1.y
       points += ' ' + between.x + ' ' + between.y + ' '
@@ -65,6 +65,13 @@ class SVGRender {
     let path = this.element.getElementById('path')
     
     path.setAttribute('d', points)
+  }
+
+  pixelPerfect(vector) {
+    let pixelVector = Matter.Vector.create(vector.x, vector.y)
+    pixelVector.x = Math.floor(pixelVector.x * 10) * 0.1
+    pixelVector.y = Math.floor(pixelVector.y * 10) * 0.1
+    return pixelVector
   }
 }
 

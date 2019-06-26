@@ -7,10 +7,10 @@ let Smoothed = function(current, dest, smoothing) {
 }
 
 class Blob {
-  constructor(position, num, size, radius) {
+  constructor(position, num, radius) {
     this.position = position
     this.num = num
-    this.size = size
+    this.size = 5
     this.radius = radius
     this.currScale = 0.5
     this.destScale = 1
@@ -23,18 +23,23 @@ class Blob {
 
   init() {
     this.currScale = 0.5
-    let initSize = 6 * this.currScale
+    let initSize = this.size * this.currScale
     let initRadius = 24 * this.currScale
 
     let frictionOptions = {
-      friction: 0.01,
-      frictionAir: 0.01,
-      frictionStatic: 0.01
+      friction: 0.1,
+      frictionAir: 0.0025,
+      frictionStatic: 0.001
     }
 
-    let constraintOptions = {
+    let circumConstraint = {
       stiffness: 0.025,
-      damping: 0.5
+      damping: 0.02
+    }
+
+    let anchorConstraint = {
+      stiffness: 0.025,
+      damping: 0.45
     }
 
     this.anchor = Matter.Bodies.circle(this.position.x, this.position.y, initSize, frictionOptions)
@@ -64,8 +69,8 @@ class Blob {
       let constraintAB = Matter.Constraint.create({
         bodyA: bodyA,
         bodyB: bodyB,
-        stiffness: constraintOptions.stiffness,
-        damping: constraintOptions.damping,
+        stiffness: circumConstraint.stiffness,
+        damping: circumConstraint.damping,
         render: {
           type: 'line'
         }
@@ -74,8 +79,8 @@ class Blob {
       let constraintAC = Matter.Constraint.create({
         bodyA: bodyA,
         bodyB: bodyC,
-        stiffness: constraintOptions.stiffness,
-        damping: constraintOptions.damping,
+        stiffness: circumConstraint.stiffness,
+        damping: circumConstraint.damping,
         render: {
           type: 'line'
         }
@@ -84,8 +89,8 @@ class Blob {
       let constraintAnchorA = Matter.Constraint.create({
         bodyA: this.anchor,
         bodyB: bodyA,
-        stiffness: constraintOptions.stiffness * 2,
-        damping: constraintOptions.damping,
+        stiffness: anchorConstraint.stiffness,
+        damping: anchorConstraint.damping,
         render: {
           type: 'line'
         }
@@ -150,8 +155,9 @@ class Blob {
           this.shrink()
         } else {
           this.springs.forEach((spring) => {
-            spring.constraint.length = spring.restLength
+            // spring.constraint.length = spring.restLength
           })
+
           this.state = 1
         }
         break
@@ -218,12 +224,12 @@ class Blob {
   }
 
   grow() {
-    let amount = 1.01
+    let amount = 1.025
     this.scale(amount)
   }
 
   shrink() {
-    let amount = 1 / 1.01
+    let amount = 1 / 1.025
     this.scale(amount)
   }
 

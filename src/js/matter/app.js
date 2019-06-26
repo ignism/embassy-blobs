@@ -15,8 +15,8 @@ class MatterApp {
       wrapper.clientWidth * 0.5,
       wrapper.clientHeight * 0.5
     )
-    this.dish = new Dish(this.wrapperCenter, 24, 240)
-    this.dishOuter = new Dish(this.wrapperCenter, 24, 260)
+    this.dish = new Dish(this.wrapperCenter, 24, 280)
+    this.dishOuter = new Dish(this.wrapperCenter, 24, 284)
     this.numBlobs = numBlobs
     this.blobs = []
     this.overblob = -1
@@ -25,6 +25,7 @@ class MatterApp {
     this.initialized = false
     this.noise = new tumult.Simplex1('seed')
     this.ticker = 0
+    this.isScaling = false
 
     if (debug) {
       this.canvasRender = new CanvasRender(
@@ -65,7 +66,7 @@ class MatterApp {
 
     let placementRadius = this.dish.radius / 2
 
-    let blobRadi = [80, 72, 48, 24]
+    let blobRadi = [96, 72, 64, 32]
 
     for (let i = 0; i < this.numBlobs; i++) {
       let angle = i / this.numBlobs * Math.PI * 2
@@ -77,7 +78,7 @@ class MatterApp {
       // let randomRadius = Math.random() * 20 + 60
       let blobRadius = blobRadi[i % blobRadi.length] * 1.25
       let size = sinAngle * blobRadius * 0.5
-      let blob = new Blob(position, blobSegments, 6, blobRadius)
+      let blob = new Blob(position, blobSegments, blobRadius)
       blob.init()
       blob.addToWorld(engine.world)
 
@@ -130,20 +131,28 @@ class MatterApp {
         if (this.blobs[blobIndex].isInside(this.mouse)) {
           if (this.overblob == -1) {
             if (this.blobs[blobIndex].state != 0) {
-              this.blobs[blobIndex].scaleTo(6)
+              // this.blobs[blobIndex].scaleTo(6)
+              this.scaleBlob(blobIndex, 6)
+              this.isScaling = true
               this.blobs[blobIndex].isMouseOver = true
             }
           } else if (this.overblob != blobIndex) {
-            this.blobs[blobIndex].scaleTo(6)
+            // this.blobs[blobIndex].scaleTo(6)
+            this.scaleBlob(blobIndex, 6)
+            this.isScaling = true
             this.blobs[blobIndex].isMouseOver = true
 
-            this.blobs[this.overblob].reset()
+            // this.blobs[this.overblob].reset()
           }
           this.overblob = blobIndex
         } else {
           if (this.overblob > -1) {
-            if (this.blobs[blobIndex].state != 0)
-              this.blobs[this.overblob].reset()
+            // if (this.blobs[blobIndex].state != 0)
+            //   this.blobs[this.overblob].reset()
+            this.blobs.forEach((blob) => {
+              blob.reset()
+              this.isScaling = false
+            })
           }
           this.overblob = -1
         }
@@ -160,17 +169,12 @@ class MatterApp {
     }
 
     if (this.initialized) {
-      // this.ticker++
-      // if (this.ticker > 100) { 
-      //   this.ticker = 0
-      //   let index = Math.floor(Math.random() * 4)
-      //   this.blobs[index].scaleTo((Math.random() + 0.5) * this.blobs[index].restScale)
-      // }
-      
       let strength = 0.0002
 
       this.blobs.forEach((blob) => {
-        blob.addMovement(this.wrapperCenter, strength)
+        if (this.isScaling == false) {
+          blob.addMovement(this.wrapperCenter, strength)
+        }
         blob.update()
       })
     } else {
@@ -184,8 +188,25 @@ class MatterApp {
       this.initialized = initialized
     }
 
-
     Matter.Engine.update(engine)
+  }
+
+  scaleBlob(index, amount) {
+    // get relative scale
+    let relativeScale = amount / this.blobs[index].restScale
+
+    this.blobs.forEach((blob, key) => {
+      if (key === index) {
+        // scale blob to amount
+        blob.scaleTo(amount)
+      } else {
+        // scale rest of blobs to 1/relative scale
+        let negativeAmount = 1 / relativeScale
+        let normalized = 1 - (1 - negativeAmount) / 2
+        let scale = blob.restScale * normalized
+        blob.scaleTo(scale)
+      }
+    })
   }
 
   draw() {
