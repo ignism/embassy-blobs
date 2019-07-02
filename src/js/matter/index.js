@@ -28,6 +28,7 @@ class MatterApp {
     this.ticker = 0
     this.isScaling = false
     this.currentBlob = -1
+    this.preloader = 0
 
     if (debug) {
       this.canvasRender = new CanvasRender(
@@ -44,11 +45,11 @@ class MatterApp {
     }
 
     let loaderWrapper = document.createElement('div')
-    loaderWrapper.setAttribute('id', 'loader-svg-wrapper')    
+    loaderWrapper.setAttribute('id', 'loader-svg-wrapper')
     let loaderString = `<svg id="image-model" class="blob-image-loader">
     <image 
     xlink:href=""
-    class="blob-image blob-pattern"></image>
+    class="blob-image blob-pattern" width="100%" height="100%"></image>
     </svg>`
 
     let blobWrapper = document.createElement('div')
@@ -78,6 +79,12 @@ class MatterApp {
         svg.setAttribute('id', embassy.slug + '-loader')
         let image = svg.querySelector('.blob-image')
         image.setAttribute('xlink:href', embassy.image)
+        image.addEventListener('load', event => {
+          this.preloader++
+          if (this.preloader == this.embassies.length) {
+            console.log('finished loading images')
+          }
+        })
         wrapper.appendChild(svg)
       }
     })
