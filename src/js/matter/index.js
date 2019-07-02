@@ -27,8 +27,7 @@ class MatterApp {
     this.noise = new tumult.Simplex1('seed')
     this.ticker = 0
     this.isScaling = false
-    this.triggers
-    this.currentScaledBlob = -1
+    this.currentBlob = -1
 
     if (debug) {
       this.canvasRender = new CanvasRender(
@@ -44,13 +43,48 @@ class MatterApp {
       Matter.Render.run(this.canvasRender.render)
     }
 
-    let svgWrapper = document.createElement('div')
-    svgWrapper.setAttribute('id', 'blob-svg-wrapper')
-    this.wrapper.appendChild(svgWrapper)
+    let loaderWrapper = document.createElement('div')
+    loaderWrapper.setAttribute('id', 'loader-svg-wrapper')    
+    let loaderString = `<svg id="image-model" class="blob-image-loader">
+    <image 
+    xlink:href=""
+    class="blob-image blob-pattern"></image>
+    </svg>`
+
+    let blobWrapper = document.createElement('div')
+    blobWrapper.setAttribute('id', 'blob-svg-wrapper')
+    let blobString = `<svg id="blob-model" class="blob-element">
+    <clipPath id="clip-path">
+      <path id="path" d=""></path>
+    </clipPath>
+    <image clip-path="url(#clip-path)" 
+    xlink:href=""
+    class="blob-image blob-pattern"></image>
+    <image clip-path="url(#clip-path)" 
+    xlink:href=""
+    class="blob-image blob-embassy"></image>
+    </svg>`
+
+    loaderWrapper.innerHTML = loaderString.trim()
+    blobWrapper.innerHTML = blobString.trim()
+    
+    this.wrapper.appendChild(loaderWrapper)
+    this.wrapper.appendChild(blobWrapper)
+
+    this.embassies.forEach(embassy => {
+      if (embassy.image) {
+        let wrapper = document.querySelector('#loader-svg-wrapper')
+        let svg = wrapper.querySelector('#image-model').cloneNode(true)
+        svg.setAttribute('id', embassy.slug + '-loader')
+        let image = svg.querySelector('.blob-image')
+        image.setAttribute('xlink:href', embassy.image)
+        wrapper.appendChild(svg)
+      }
+    })
+
 
     this.createDish()
     this.createBlobs()
-    this.createTriggers()
     this.addEventListeners()
 
     this.animate()
@@ -70,7 +104,6 @@ class MatterApp {
     }
 
     let blobSegments = 12
-    let sinAngle = Math.sin(Math.PI * 2 / blobSegments)
 
     let svgWrapper = this.wrapper.querySelector('#blob-svg-wrapper')
 
@@ -100,14 +133,6 @@ class MatterApp {
     }
   }
 
-  createTriggers() {
-    let triggerInterface = document.getElementById('blob-interface')
-
-    if (triggerInterface) {
-      this.triggers = Array.from(triggerInterface.querySelectorAll('.blob-trigger'))
-    }
-  }
-
   addEventListeners() {
     window.addEventListener(
       'resize',
@@ -124,65 +149,42 @@ class MatterApp {
         this.wrapperCenter = wrapperCenter
       }, 200)
     )
+  }
 
-    // window.addEventListener(
-    //   'mousemove',
-    //   throttle((event) => {
-    //     let distance = 99999
-    //     let index = 0
-    //     let blobIndex = -1
-    //     this.mouse.x = Math.max(0, event.clientX - window.innerWidth * 0.5)
-    //     this.mouse.y = event.clientY
-    //     this.blobs.forEach((blob) => {
-    //       let distBlob = Matter.Vector.magnitude(
-    //         Matter.Vector.sub(this.mouse, blob.getCenter())
-    //       )
-    //       if (distBlob < distance) {
-    //         distance = distBlob
-    //         blobIndex = index
-    //       }
-    //       index++
-    //     })
-    //     if (this.blobs[blobIndex].isInside(this.mouse)) {
-    //       if (this.overblob == -1) {
-    //         if (this.blobs[blobIndex].state != 0) {
-    //           // this.blobs[blobIndex].scaleTo(6)
-    //           this.scaleBlob(blobIndex, 6)
-    //           this.isScaling = true
-    //           this.blobs[blobIndex].isMouseOver = true
-    //         }
-    //       } else if (this.overblob != blobIndex) {
-    //         // this.blobs[blobIndex].scaleTo(6)
-    //         this.scaleBlob(blobIndex, 6)
-    //         this.isScaling = true
-    //         this.blobs[blobIndex].isMouseOver = true
-    //         // this.blobs[this.overblob].reset()
-    //       }
-    //       this.overblob = blobIndex
-    //     } else {
-    //       if (this.overblob > -1) {
-    //         // if (this.blobs[blobIndex].state != 0)
-    //         //   this.blobs[this.overblob].reset()
-    //         this.blobs.forEach((blob) => {
-    //           blob.reset()
-    //           this.isScaling = false
-    //         })
-    //       }
-    //       this.overblob = -1
-    //     }
-    //   }, 20)
-    // )
-
-    this.triggers.forEach(trigger => {
-      trigger.addEventListener('mouseenter', event => {
-        let index = Math.floor(Math.random() * 4)
-        while (index == this.currentScaledBlob) {
-          index = Math.floor(Math.random() * 4)
-        }
-        this.scaleBlob(index, 6)
-        this.currentScaledBlob = index
-      })
+  reset() {
+    this.blobs.forEach(blob => {
+      blob.reset()
     })
+
+    this.svgRenders.forEach(svgRender => {
+      svgRender.reset()
+    })
+  }
+
+  highlight(slug) {
+    if (slug) {
+      this.embassies.forEach(embassy => {
+        if (embassy.slug == slug) {
+
+          let index = Math.floor(Math.random() * 4)
+          while (index == this.currentBlob) {
+            index = Math.floor(Math.random() * 4)
+          }
+
+          this.scaleBlob(index, 6)
+          this.setBlobBackground(index, embassy.image)
+          this.currentBlob = index
+        }
+      })
+    }
+  }
+
+  activate() {
+
+  }
+
+  fadeImage() {
+
   }
 
   animate() {
@@ -246,6 +248,9 @@ class MatterApp {
     })
   }
 
+  setBlobBackground(index, image) {
+    this.svgRenders[index].setBackgroundImage(image)
+  }
 }
 
 export default MatterApp

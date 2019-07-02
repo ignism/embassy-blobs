@@ -4,33 +4,25 @@ class SVGRender {
   constructor(wrapper, blob, index) {
     this.wrapper = wrapper
     this.blob = blob
-
-    if (!document.getElementById('blob-model'))  {
-      let svgString = `<svg id="blob-model" class="blob-element">
-      <clipPath id="clip-path">
-        <path id="path" d=""></path>
-      </clipPath>
-      
-      <image clip-path="url(#clip-path)" 
-      xlink:href=""
-      class="blob-image">
-      </svg>`
-
-      this.wrapper.innerHTML = svgString.trim()
-    }
     
     let model = document.getElementById('blob-model')
-    // let model = _model
+
     let element = model.cloneNode(true)
     element.setAttribute('id', 'blob-element-' + index)
     element.querySelector('clipPath').setAttribute('id', 'clip-path-' + index)
-    let image  = element.querySelector('image')
-    // let image  = document.createElementNS(svgNS, 'image')
-    image.setAttribute('clip-path', 'url(#clip-path-' + index + ')')
-    image.setAttribute('xlink:href', 'images/pattern' + index + '.png')
-    image.setAttribute('width', '100%')
-    image.setAttribute('height', '100%')
-    // element.appendChild(image)
+
+    let patternImage  = element.querySelector('image.blob-pattern')
+    patternImage.setAttribute('clip-path', 'url(#clip-path-' + index + ')')
+    patternImage.setAttribute('xlink:href', 'images/pattern' + index + '.png')
+    patternImage.setAttribute('width', '100%')
+    patternImage.setAttribute('height', '100%')
+
+    let embassyImage  = element.querySelector('image.blob-embassy')
+    embassyImage.setAttribute('clip-path', 'url(#clip-path-' + index + ')')
+    embassyImage.setAttribute('xlink:href', '')
+    embassyImage.setAttribute('width', '100%')
+    embassyImage.setAttribute('height', '100%')
+
     this.element = element
     wrapper.appendChild(this.element)
   }
@@ -85,6 +77,18 @@ class SVGRender {
     
     path.setAttribute('d', points)
   }
+
+  reset() {
+    this.element.classList.remove('active')
+  }
+  
+  setBackgroundImage(image) {
+    let embassyImage  = this.element.querySelector('image.blob-embassy')
+    embassyImage.setAttribute('xlink:href', image)
+    this.element.classList.add('active')
+  }
+
+
 
   pixelPerfect(vector) {
     let pixelVector = Matter.Vector.create(vector.x, vector.y)
