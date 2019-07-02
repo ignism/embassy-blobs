@@ -5,13 +5,32 @@ class SVGRender {
     this.wrapper = wrapper
     this.blob = blob
 
+    if (!document.getElementById('blob-model'))  {
+      let svgString = `<svg id="blob-model" class="blob-element">
+      <clipPath id="clip-path">
+        <path id="path" d=""></path>
+      </clipPath>
+      
+      <image clip-path="url(#clip-path)" 
+      xlink:href=""
+      class="blob-image">
+      </svg>`
+
+      this.wrapper.innerHTML = svgString.trim()
+    }
+    
     let model = document.getElementById('blob-model')
+    // let model = _model
     let element = model.cloneNode(true)
     element.setAttribute('id', 'blob-element-' + index)
     element.querySelector('clipPath').setAttribute('id', 'clip-path-' + index)
     let image  = element.querySelector('image')
+    // let image  = document.createElementNS(svgNS, 'image')
     image.setAttribute('clip-path', 'url(#clip-path-' + index + ')')
     image.setAttribute('xlink:href', 'images/pattern' + index + '.png')
+    image.setAttribute('width', '100%')
+    image.setAttribute('height', '100%')
+    // element.appendChild(image)
     this.element = element
     wrapper.appendChild(this.element)
   }
