@@ -13,13 +13,19 @@
 
   <div class="flex flex-wrap">
     <!-- <div id="blob-debug"></div> -->
-    <div id="blob-interface" class="w-1/2 h-screen flex flex-col justify-center">
+    <div id="blob-interface" class="w-1/2 h-screen flex flex-col justify-center relative">
       <div class="flex justify-center">
         <ul class="w-1/4">
           <li class="my-8 font-bold text-xl"><span class="blob-trigger" data-slug="embassy-1">Lorem ipsum</span></li>
           <li class="my-8 font-bold text-xl"><span class="blob-trigger" data-slug="embassy-2">Dolor sit</span></li>
           <li class="my-8 font-bold text-xl"><span class="blob-trigger" data-slug="embassy-3">Amet lorem</span></li>
         </ul>
+      </div>
+
+      <div class="embassy-detail absolute inset-0 bg-orange-400 flex flex-wrap justify-center items-center hidden">
+        <a class="button-back mx-auto w-10/12 text-left mb-64 font-bold" href="#">back</a>
+        <h1 class="mx-auto w-10/12 text-center text-4xl">Embassy</h1>
+        <a class="button-activate mx-auto w-10/12 text-center text-xl font-bold" href="#">activate</a>
       </div>
     </div>
     <div id="blob-app">

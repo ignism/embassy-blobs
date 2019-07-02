@@ -16,19 +16,29 @@ const embassies = [
 ]
 const wrapper = document.getElementById('blob-app')
 const matterApp = new MatterApp(wrapper, embassies, 4)
+const embassyDetail = document.querySelector('.embassy-detail')
+const buttonBack = embassyDetail.querySelector('.button-back')
+
+buttonBack.addEventListener('click', event => {
+  event.preventDefault()
+
+  embassyDetail.classList.add('hidden')
+  matterApp.reset()
+})
 
 let triggers = Array.from(document.querySelectorAll('.blob-trigger'))
 triggers.forEach((trigger) => {
-  trigger.addEventListener('mouseenter', (event) => {
+  trigger.addEventListener('click', (event) => {
+    event.preventDefault()
+
     let slug = trigger.getAttribute('data-slug')
 
     if (slug) {
       matterApp.highlight(slug)
+    
+      embassyDetail.querySelector('h1').innerText = slug
+      embassyDetail.classList.remove('hidden')
     }
-  })
-
-  trigger.addEventListener('mouseleave', (event) => {
-    matterApp.reset()
   })
 })
 
