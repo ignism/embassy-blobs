@@ -1,4 +1,5 @@
 import MatterApp from './matter'
+import '../css/matter-app.css'
 
 const embassies = [
   {
