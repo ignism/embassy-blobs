@@ -1,4 +1,4 @@
-import Matter from 'matter-js/build/matter.min.js'
+import Matter from 'matter-js'
 
 const engine = Matter.Engine.create()
 engine.world.gravity.y = 0

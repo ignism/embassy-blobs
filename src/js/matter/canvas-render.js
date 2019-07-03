@@ -1,7 +1,4 @@
-import Matter from 'matter-js/build/matter.min.js'
-
-// let element = document.getElementById('matter-app')
-// const render = Matter.Render.create({ element: element, engine: engine })
+import Matter from 'matter-js'
 
 class CanvasRender {
   constructor(element, engine) {
@@ -18,8 +15,6 @@ class CanvasRender {
   resize() {
     this.render.canvas.width = this.element.clientWidth
     this.render.canvas.height = this.element.clientHeight
-
-    console.log('resized')
   }
 
   addEventListeners() {

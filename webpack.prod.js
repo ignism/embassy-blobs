@@ -1,10 +1,9 @@
 const merge = require('webpack-merge')
 const path = require('path')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
-const TerserPlugin = require('terser-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const common = require('./webpack.common.js')
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const TerserPlugin = require('terser-webpack-plugin')
 
 process.env.NODE_ENV = 'production'
 
@@ -13,10 +12,10 @@ module.exports = merge(common, {
 
   plugins: [
     new BundleAnalyzerPlugin(),
-    new CleanWebpackPlugin(path.resolve(__dirname, 'www')),
+    // new CleanWebpackPlugin(path.resolve(__dirname, 'www')),
   ],
 
-  optimization: {
-    minimizer: [new UglifyJsPlugin()],
-  },
+  // optimization: {
+  //   minimizer: [new TerserPlugin()],
+  // },
 })

@@ -248,10 +248,6 @@ class Blob {
     let perpendicular = Matter.Vector.rotate(norm, Math.PI * 0.5 * ((Math.random() - 0.5) * 0.1 + 1))
     let force = Matter.Vector.mult(perpendicular, strength * this.currScale)
 
-    if (debug) {
-      // console.log(force)
-    }
-
     Matter.Body.applyForce(this.anchor, this.anchor.position, force)
   }
 

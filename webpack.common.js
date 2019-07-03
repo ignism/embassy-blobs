@@ -27,7 +27,7 @@ module.exports = {
     rules: [{
       test: /\.ts$/,
 
-      include: [path.resolve(__dirname, 'src')],
+      exclude: /node_modules/,
 
       use: {
         loader: 'babel-loader',
@@ -36,7 +36,7 @@ module.exports = {
     }, {
       test: /\.js$/,
 
-      include: [path.resolve(__dirname, 'src')],
+      exclude: /node_modules/,
 
       loader: 'babel-loader',
     }, {

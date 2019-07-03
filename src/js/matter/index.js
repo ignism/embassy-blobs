@@ -23,12 +23,15 @@ class MatterApp {
     this.overblob = -1
     this.svgRenders = []
     this.debug = debug
+    this.blobsInitialized = false
     this.initialized = false
     this.noise = new tumult.Simplex1('seed')
     this.ticker = 0
     this.isScaling = false
     this.currentBlob = -1
-    this.preloader = 0
+    this.preloadedImages = 0
+    this.isRunning = true
+    this.throttledResize = throttle(this.resize, 200)
 
     if (debug) {
       this.canvasRender = new CanvasRender(
@@ -60,35 +63,31 @@ class MatterApp {
     </clipPath>
     <image clip-path="url(#clip-path)" 
     xlink:href=""
-    class="blob-image blob-pattern"></image>
+    class="blob-image blob-pattern" preserveAspectRatio="xMinYMin slice"></image>
     <image clip-path="url(#clip-path)" 
     xlink:href=""
-    class="blob-image blob-embassy"></image>
+    class="blob-image blob-embassy" preserveAspectRatio="xMinYMin slice"></image>
     </svg>`
 
     loaderWrapper.innerHTML = loaderString.trim()
     blobWrapper.innerHTML = blobString.trim()
-    
+
     this.wrapper.appendChild(loaderWrapper)
     this.wrapper.appendChild(blobWrapper)
 
-    this.embassies.forEach(embassy => {
+    this.embassies.forEach((embassy) => {
       if (embassy.image) {
         let wrapper = document.querySelector('#loader-svg-wrapper')
         let svg = wrapper.querySelector('#image-model').cloneNode(true)
         svg.setAttribute('id', embassy.slug + '-loader')
         let image = svg.querySelector('.blob-image')
         image.setAttribute('xlink:href', embassy.image)
-        image.addEventListener('load', event => {
-          this.preloader++
-          if (this.preloader == this.embassies.length) {
-            console.log('finished loading images')
-          }
+        image.addEventListener('load', (event) => {
+          this.preloadedImages++
         })
         wrapper.appendChild(svg)
       }
     })
-
 
     this.createDish()
     this.createBlobs()
@@ -141,63 +140,83 @@ class MatterApp {
   }
 
   addEventListeners() {
-    window.addEventListener(
-      'resize',
-      throttle((event) => {
-        if (this.debug) {
-          this.canvasRender.resize()
-        }
+    window.addEventListener('resize', this.throttledResize, false)
+  }
 
-        let wrapperCenter = Matter.Vector.create(
-          this.wrapper.clientWidth * 0.5,
-          this.wrapper.clientHeight * 0.5
-        )
+  resize() {
+    if (this.debug) {
+      this.canvasRender.resize()
+    }
 
-        this.wrapperCenter = wrapperCenter
-      }, 200)
+    let wrapperCenter = Matter.Vector.create(
+      this.wrapper.clientWidth * 0.5,
+      this.wrapper.clientHeight * 0.5
     )
+
+    this.wrapperCenter = wrapperCenter
   }
 
   reset() {
-    this.blobs.forEach(blob => {
+    this.blobs.forEach((blob) => {
       blob.reset()
     })
 
-    this.svgRenders.forEach(svgRender => {
+    this.svgRenders.forEach((svgRender) => {
       svgRender.reset()
     })
   }
 
   highlight(slug) {
-    if (slug) {
-      this.embassies.forEach(embassy => {
-        if (embassy.slug == slug) {
-
-          let index = Math.floor(Math.random() * 4)
-          while (index == this.currentBlob) {
-            index = Math.floor(Math.random() * 4)
+    if (this.initialized) {
+      if (slug) {
+        this.embassies.forEach((embassy) => {
+          if (embassy.slug == slug) {
+            let index = Math.floor(Math.random() * 4)
+            while (index == this.currentBlob) {
+              index = Math.floor(Math.random() * 4)
+            }
+            
+            this.scaleBlob(index, 6)
+            this.setBlobBackground(index, embassy.image)
+            this.currentBlob = index
           }
+        })
 
-          this.scaleBlob(index, 6)
-          this.setBlobBackground(index, embassy.image)
-          this.currentBlob = index
-        }
-      })
+        return true
+      }
     }
+    return false
   }
 
   activate() {
-
+    if (this.currentBlob > -1) {
+      this.stop()
+      this.svgRenders[this.currentBlob].blowUp()
+      this.destroy()
+      return true
+    }
+    return false
   }
 
-  fadeImage() {
+  run() {
+    this.isRunning = true
+  }
 
+  stop() {
+    this.isRunning = false
+  }
+
+  destroy() {
+    window.removeEventListener('resize', this.throttledResize, false)
+    this.stop()
   }
 
   animate() {
-    this.update()
-    this.draw()
-    window.requestAnimationFrame(this.animate.bind(this))
+    if (this.isRunning) {
+      this.update()
+      this.draw()
+      window.requestAnimationFrame(this.animate.bind(this))
+    }
   }
 
   update() {
@@ -208,7 +227,13 @@ class MatterApp {
       this.dish.moveTo(newPosition)
     }
 
-    if (this.initialized) {
+    if (!this.initialized) {
+      if (this.blobsInitialized && this.preloadedImages === this.embassies.length) {
+        this.initialized = true
+      }
+    }
+
+    if (this.blobsInitialized) {
       let strength = 0.0002
 
       this.blobs.forEach((blob) => {
@@ -225,7 +250,7 @@ class MatterApp {
         }
         blob.update()
       })
-      this.initialized = initialized
+      this.blobsInitialized = initialized
     }
 
     Matter.Engine.update(engine)

@@ -1,4 +1,4 @@
-import Matter from 'matter-js/build/matter.min.js'
+import Matter from 'matter-js'
 // module aliases
 let Engine = Matter.Engine,
   Render = Matter.Render,

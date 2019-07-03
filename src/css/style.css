@@ -24,11 +24,6 @@
   background: #aaa;
 }
 
-.blob-element {
-  width: 100%;
-  height: 100%;
-}
-
 .blob-image-loader {
   width: 100%;
   height: 100%;
@@ -46,6 +41,13 @@
   bottom: 0;
   left: 0;
   right: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+}
+
+.blob-element.active {
+  z-index: 20;
 }
 
 .blob-embassy {
