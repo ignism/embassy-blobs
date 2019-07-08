@@ -10,7 +10,7 @@ class Blob {
   constructor(position, num, radius) {
     this.position = position
     this.num = num
-    this.size = 5
+    this.size = 6
     this.radius = radius
     this.currScale = 0.5
     this.destScale = 1
@@ -34,15 +34,15 @@ class Blob {
 
     let circumConstraint = {
       stiffness: 0.025,
-      damping: 0.02
+      damping: 0.5
     }
 
     let anchorConstraint = {
-      stiffness: 0.025,
-      damping: 0.45
+      stiffness: 0.0025,
+      damping: 0.8
     }
 
-    this.anchor = Matter.Bodies.circle(this.position.x, this.position.y, initSize, frictionOptions)
+    this.anchor = Matter.Bodies.circle(this.position.x, this.position.y, initSize * 2, frictionOptions)
 
     for (let i = 0; i < this.num; i++) {
       let angle = i / this.num * Math.PI * 2
@@ -221,6 +221,11 @@ class Blob {
     })
 
     Matter.Body.scale(this.anchor, amount, amount)
+  }
+
+  resize(scale) {
+    this.restScale = this.restScale * scale;
+    this.scaleTo(this.restScale)
   }
 
   grow() {

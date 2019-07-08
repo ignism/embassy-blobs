@@ -12,12 +12,13 @@ class MatterApp {
     this.embassies = embassies
     this.wrapper = wrapper
     this.mouse = Matter.Vector.create()
-    this.wrapperCenter = Matter.Vector.create(
-      wrapper.clientWidth * 0.5,
-      wrapper.clientHeight * 0.5
+    this.dishOrigin = Matter.Vector.create(
+      wrapper.clientWidth * 0.65,
+      wrapper.clientHeight * 0.45
     )
-    this.dish = new Dish(this.wrapperCenter, 24, 280)
-    this.dishOuter = new Dish(this.wrapperCenter, 24, 284)
+    this.dishSize = 0.6
+    this.dish = new Dish(this.dishOrigin, 24, wrapper.clientWidth * this.dishSize)
+    this.dishOuter = new Dish(this.dishOrigin, 24, wrapper.clientWidth * this.dishSize + 4)
     this.numBlobs = numBlobs
     this.blobs = []
     this.overblob = -1
@@ -31,7 +32,7 @@ class MatterApp {
     this.currentBlob = -1
     this.preloadedImages = 0
     this.isRunning = true
-    this.throttledResize = throttle(this.resize, 200)
+    this.throttledResize = throttle(this.resize.bind(this), 200)
 
     if (debug) {
       this.canvasRender = new CanvasRender(
@@ -104,24 +105,20 @@ class MatterApp {
   }
 
   createBlobs() {
-    let center = {
-      x: this.wrapper.clientWidth * 0.5,
-      y: this.wrapper.clientHeight * 0.5
-    }
-
     let blobSegments = 12
 
     let svgWrapper = this.wrapper.querySelector('#blob-svg-wrapper')
 
     let placementRadius = this.dish.radius / 2
 
-    let blobRadi = [96, 72, 64, 32]
+    let rNorm = this.wrapper.clientWidth * this.dishSize * 0.4
+    let blobRadi = [rNorm * 1, rNorm * 0.85, rNorm * 0.75, rNorm * 0.5]
 
     for (let i = 0; i < this.numBlobs; i++) {
       let angle = i / this.numBlobs * Math.PI * 2
       let position = Matter.Vector.create(
-        center.x + Math.cos(angle) * placementRadius,
-        center.y + Math.sin(angle) * placementRadius
+        this.dishOrigin.x + Math.cos(angle) * placementRadius,
+        this.dishOrigin.y + Math.sin(angle) * placementRadius
       )
 
       // let randomRadius = Math.random() * 20 + 60
@@ -148,12 +145,28 @@ class MatterApp {
       this.canvasRender.resize()
     }
 
-    let wrapperCenter = Matter.Vector.create(
-      this.wrapper.clientWidth * 0.5,
-      this.wrapper.clientHeight * 0.5
-    )
+    if (this.initialized) {
+      let dishOrigin = Matter.Vector.create(
+        this.wrapper.clientWidth * 0.65,
+        this.wrapper.clientHeight * 0.45
+      )
 
-    this.wrapperCenter = wrapperCenter
+      this.dish.moveTo(dishOrigin)
+      this.dishOuter.moveTo(dishOrigin)
+      
+      let dishScale = this.wrapper.clientWidth * this.dishSize / this.dish.radius
+      let blobScale = 1 + ((dishScale - 1) * 0.66667)
+      // let blobScale = dishScale 
+
+      console.log(dishScale, blobScale)
+      
+      this.blobs.forEach(blob => {
+        blob.resize(blobScale)
+      })
+
+      this.dish.resizeTo(this.wrapper.clientWidth * this.dishSize)
+      this.dishOuter.resizeTo(this.wrapper.clientWidth * this.dishSize + 4)
+    }
   }
 
   reset() {
@@ -176,7 +189,9 @@ class MatterApp {
               index = Math.floor(Math.random() * 4)
             }
             
-            this.scaleBlob(index, 6)
+            let scale = this.wrapper.clientWidth * this.dishSize / 24 * 0.65
+
+            this.scaleBlob(index, scale)
             this.setBlobBackground(index, embassy.image)
             this.currentBlob = index
           }
@@ -220,12 +235,13 @@ class MatterApp {
   }
 
   update() {
-    let offset = Matter.Vector.sub(this.wrapperCenter, this.dish.position)
-    if (Matter.Vector.magnitude(offset) > 4) {
-      let norm = Matter.Vector.mult(Matter.Vector.normalise(offset), 4)
-      let newPosition = Matter.Vector.add(this.dish.position, norm)
-      this.dish.moveTo(newPosition)
-    }
+    // let offset = Matter.Vector.sub(this.dishOrigin, this.dish.position)
+    // if (Matter.Vector.magnitude(offset) > 4) {
+    //   let norm = Matter.Vector.mult(Matter.Vector.normalise(offset), 4)
+    //   let newPosition = Matter.Vector.add(this.dish.position, norm)
+    //   this.dish.moveTo(newPosition)
+    //   this.dishOuter.moveTo(newPosition)
+    // }
 
     if (!this.initialized) {
       if (this.blobsInitialized && this.preloadedImages === this.embassies.length) {
@@ -234,12 +250,11 @@ class MatterApp {
     }
 
     if (this.blobsInitialized) {
-      let strength = 0.0002
-
+      // let strength = 0.0002
       this.blobs.forEach((blob) => {
-        if (this.isScaling == false) {
-          blob.addMovement(this.wrapperCenter, strength)
-        }
+        // if (this.isScaling == false) {
+        //   blob.addMovement(this.dishOrigin, strength)
+        // }
         blob.update()
       })
     } else {
@@ -252,6 +267,9 @@ class MatterApp {
       })
       this.blobsInitialized = initialized
     }
+
+    this.dish.update()
+    this.dishOuter.update()
 
     Matter.Engine.update(engine)
   }

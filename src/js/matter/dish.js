@@ -3,8 +3,10 @@ import Matter from 'matter-js'
 class Dish {
   constructor(position, num, radius) {
     this.position = position
+    this.targetPosition = position
     this.num = num
     this.radius = radius
+    this.targetRadius = radius
     this.bodies = []
   }
 
@@ -29,6 +31,42 @@ class Dish {
     }
   }
 
+  update() {
+    // let offset = Matter.Vector.sub(this.targetPosition, this.position)
+
+    // if (Matter.Vector.magnitude(offset) > 10) {
+    //   this.bodies.forEach(body => {
+    //     offset = Matter.Vector.mult(offset, 0.1)
+    //     let newPosition = Matter.Vector.add(body.position, offset)
+    //     Matter.Body.setPosition(body, newPosition)
+    //   })
+
+    //   this.position = this.getCenter()
+    // }
+
+    
+    let targetScale = this.targetRadius / this.radius
+    if (Math.abs(targetScale - 1) > 0.001) {
+      let offset = Matter.Vector.sub(this.targetPosition, this.position)
+      offset = Matter.Vector.mult(offset, 0.1)
+      this.position = Matter.Vector.add(this.position, offset)
+      
+      let scaleStep = (targetScale - 1) * 0.1
+      let scale = 1 + scaleStep
+      this.radius *= scale
+
+      this.bodies.forEach(body => {
+        let bodyOffset = Matter.Vector.sub(this.position, body.position)
+        bodyOffset = Matter.Vector.mult(bodyOffset, scale)
+
+        Matter.Body.setPosition(body, Matter.Vector.add(this.position, bodyOffset))
+        Matter.Body.scale(body, scale, scale)
+      })
+    } else {
+      this.targetRadius = this.radius
+    }
+  } 
+
   getCenter() {
     let center = Matter.Vector.create()
 
@@ -44,14 +82,25 @@ class Dish {
   }
 
   moveTo(position) {
-    let offset = Matter.Vector.sub(position, this.getCenter())
+    // let offset = Matter.Vector.sub(position, this.getCenter())
 
-    this.bodies.forEach(body => {
-      let newPosition = Matter.Vector.add(body.position, offset)
-      Matter.Body.setPosition(body, newPosition)
-    })
+    // this.bodies.forEach(body => {
+    //   let newPosition = Matter.Vector.add(body.position, offset)
+    //   Matter.Body.setPosition(body, newPosition)
+    // })
 
-    this.position = this.getCenter()
+    // this.position = this.getCenter()
+    this.targetPosition = position
+  }
+
+  resizeTo(radius) {
+    // this.bodies.forEach(body => {
+    //   let offset = Matter.Vector.sub(this.position, body.position)
+    //   offset = Matter.Vector.mult(offset, scale)
+
+    //   Matter.Body.setPosition(body, Matter.Vector.add(this.position, offset))
+    // })
+    this.targetRadius = radius
   }
 
   addToWorld(world) {
