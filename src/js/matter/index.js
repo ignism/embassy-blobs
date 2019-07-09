@@ -12,13 +12,10 @@ class MatterApp {
     this.embassies = embassies
     this.wrapper = wrapper
     this.mouse = Matter.Vector.create()
-    this.dishOrigin = Matter.Vector.create(
-      wrapper.clientWidth * 0.65,
-      wrapper.clientHeight * 0.45
-    )
-    this.dishSize = 0.6
-    this.dish = new Dish(this.dishOrigin, 24, wrapper.clientWidth * this.dishSize)
-    this.dishOuter = new Dish(this.dishOrigin, 24, wrapper.clientWidth * this.dishSize + 4)
+    this.dishOrigin = this.calcDishOrigin()
+    this.dishSize = this.calcDishSize()
+    this.dish = new Dish(this.dishOrigin, 24, this.dishSize)
+    this.dishOuter = new Dish(this.dishOrigin, 24, this.dishSize + 4)
     this.numBlobs = numBlobs
     this.blobs = []
     this.overblob = -1
@@ -73,6 +70,10 @@ class MatterApp {
     loaderWrapper.innerHTML = loaderString.trim()
     blobWrapper.innerHTML = blobString.trim()
 
+    loaderWrapper.style.opacity = 0
+    blobWrapper.style.opacity = 0
+    blobWrapper.style.transition = '500ms ease-out'
+
     this.wrapper.appendChild(loaderWrapper)
     this.wrapper.appendChild(blobWrapper)
 
@@ -97,6 +98,20 @@ class MatterApp {
     this.animate()
   }
 
+  calcDishSize() {
+    let w = this.wrapper.clientWidth
+    let h = this.wrapper.clientHeight
+    return Math.sqrt(w * w + h * h) * 0.4
+  }
+
+  calcDishOrigin() {
+    let w = this.wrapper.clientWidth
+    let s = this.calcDishSize()
+    let x = w * 0.05 + s
+    let y = this.wrapper.clientHeight * 0.45
+    return Matter.Vector.create(x, y)
+  }
+
   createDish() {
     this.dish.init()
     this.dish.addToWorld(engine.world)
@@ -111,8 +126,8 @@ class MatterApp {
 
     let placementRadius = this.dish.radius / 2
 
-    let rNorm = this.wrapper.clientWidth * this.dishSize * 0.4
-    let blobRadi = [rNorm * 1, rNorm * 0.85, rNorm * 0.75, rNorm * 0.5]
+    let rNorm = this.dishSize * 0.4
+    let blobRadi = [rNorm * 1, rNorm * 0.8, rNorm * 0.7, rNorm * 0.5]
 
     for (let i = 0; i < this.numBlobs; i++) {
       let angle = i / this.numBlobs * Math.PI * 2
@@ -121,9 +136,7 @@ class MatterApp {
         this.dishOrigin.y + Math.sin(angle) * placementRadius
       )
 
-      // let randomRadius = Math.random() * 20 + 60
       let blobRadius = blobRadi[i % blobRadi.length] * 1.25
-      // let size = sinAngle * blobRadius * 0.5
       let blob = new Blob(position, blobSegments, blobRadius)
       blob.init()
       blob.addToWorld(engine.world)
@@ -137,7 +150,7 @@ class MatterApp {
   }
 
   addEventListeners() {
-    window.addEventListener('resize', this.throttledResize, false)
+    window.addEventListener('resize', this.throttledResize, true)
   }
 
   resize() {
@@ -146,26 +159,21 @@ class MatterApp {
     }
 
     if (this.initialized) {
-      let dishOrigin = Matter.Vector.create(
-        this.wrapper.clientWidth * 0.65,
-        this.wrapper.clientHeight * 0.45
-      )
+      let dishOrigin = this.calcDishOrigin()
 
       this.dish.moveTo(dishOrigin)
       this.dishOuter.moveTo(dishOrigin)
-      
-      let dishScale = this.wrapper.clientWidth * this.dishSize / this.dish.radius
-      let blobScale = 1 + ((dishScale - 1) * 0.66667)
-      // let blobScale = dishScale 
 
-      console.log(dishScale, blobScale)
-      
-      this.blobs.forEach(blob => {
+      this.dishSize = this.calcDishSize()
+      let dishScale = this.dishSize / this.dish.radius
+      let blobScale = 1 + (dishScale - 1) * 0.66667
+
+      this.blobs.forEach((blob) => {
         blob.resize(blobScale)
       })
 
-      this.dish.resizeTo(this.wrapper.clientWidth * this.dishSize)
-      this.dishOuter.resizeTo(this.wrapper.clientWidth * this.dishSize + 4)
+      this.dish.resizeTo(this.dishSize)
+      this.dishOuter.resizeTo(this.dishSize + 4)
     }
   }
 
@@ -188,7 +196,7 @@ class MatterApp {
             while (index == this.currentBlob) {
               index = Math.floor(Math.random() * 4)
             }
-            
+
             let scale = this.wrapper.clientWidth * this.dishSize / 24 * 0.65
 
             this.scaleBlob(index, scale)
@@ -235,26 +243,18 @@ class MatterApp {
   }
 
   update() {
-    // let offset = Matter.Vector.sub(this.dishOrigin, this.dish.position)
-    // if (Matter.Vector.magnitude(offset) > 4) {
-    //   let norm = Matter.Vector.mult(Matter.Vector.normalise(offset), 4)
-    //   let newPosition = Matter.Vector.add(this.dish.position, norm)
-    //   this.dish.moveTo(newPosition)
-    //   this.dishOuter.moveTo(newPosition)
-    // }
-
     if (!this.initialized) {
-      if (this.blobsInitialized && this.preloadedImages === this.embassies.length) {
+      if (
+        this.blobsInitialized &&
+        this.preloadedImages === this.embassies.length
+      ) {
         this.initialized = true
+        this.wrapper.querySelector('#blob-svg-wrapper').style.opacity = 1
       }
     }
 
     if (this.blobsInitialized) {
-      // let strength = 0.0002
       this.blobs.forEach((blob) => {
-        // if (this.isScaling == false) {
-        //   blob.addMovement(this.dishOrigin, strength)
-        // }
         blob.update()
       })
     } else {
@@ -281,17 +281,14 @@ class MatterApp {
   }
 
   scaleBlob(index, amount) {
-    // get relative scale
     let relativeScale = amount / this.blobs[index].restScale
 
     this.blobs.forEach((blob, key) => {
       if (key === index) {
-        // scale blob to amount
         blob.scaleTo(amount)
       } else {
-        // scale rest of blobs to 1/relative scale
         let negativeAmount = 1 / relativeScale
-        let normalized = 1 - (1 - negativeAmount) / 2
+        let normalized = 1 - (1 - negativeAmount) / 1
         let scale = blob.restScale * normalized
         blob.scaleTo(scale)
       }

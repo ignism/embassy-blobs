@@ -14,7 +14,7 @@ class SVGRender {
 
     let patternImage = element.querySelector('image.blob-pattern')
     patternImage.setAttribute('clip-path', 'url(#clip-path-' + index + ')')
-    patternImage.setAttribute('xlink:href', 'images/pattern' + index + '.png')
+    patternImage.setAttribute('xlink:href', 'images/pattern-' + index + '.svg')
     patternImage.setAttribute('width', '100%')
     patternImage.setAttribute('height', '100%')
 
@@ -26,7 +26,6 @@ class SVGRender {
 
     this.element = element
     wrapper.appendChild(this.element)
-
   }
 
   init() {
@@ -72,7 +71,12 @@ class SVGRender {
     let h = this.wrapper.clientHeight
     let margin = 100
 
-    if (vector.x > (0 - margin) && vector.x < (w + margin) && vector.y > (0 - margin) && vector.y < (h + margin)) {
+    if (
+      vector.x > 0 - margin &&
+      vector.x < w + margin &&
+      vector.y > 0 - margin &&
+      vector.y < h + margin
+    ) {
       return true
     }
 

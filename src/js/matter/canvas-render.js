@@ -17,8 +17,7 @@ class CanvasRender {
     this.render.canvas.height = this.element.clientHeight
   }
 
-  addEventListeners() {
-  }
+  addEventListeners() {}
 }
 
 export default CanvasRender

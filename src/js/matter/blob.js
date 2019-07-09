@@ -12,7 +12,7 @@ class Blob {
     this.num = num
     this.size = 6
     this.radius = radius
-    this.currScale = 0.5
+    this.currScale = 1
     this.destScale = 1
     this.restScale = radius / 24
     this.bodies = []
@@ -22,27 +22,32 @@ class Blob {
   }
 
   init() {
-    this.currScale = 0.5
+    this.currScale = 1
     let initSize = this.size * this.currScale
     let initRadius = 24 * this.currScale
 
     let frictionOptions = {
-      friction: 0.1,
-      frictionAir: 0.0025,
-      frictionStatic: 0.001
+      friction: 0.001,
+      frictionAir: 0.0001,
+      frictionStatic: 0.0001
     }
 
     let circumConstraint = {
       stiffness: 0.025,
-      damping: 0.5
+      damping: 0.8
     }
 
     let anchorConstraint = {
       stiffness: 0.0025,
-      damping: 0.8
+      damping: 0.9
     }
 
-    this.anchor = Matter.Bodies.circle(this.position.x, this.position.y, initSize * 2, frictionOptions)
+    this.anchor = Matter.Bodies.circle(
+      this.position.x,
+      this.position.y,
+      initSize * 2,
+      frictionOptions
+    )
 
     for (let i = 0; i < this.num; i++) {
       let angle = i / this.num * Math.PI * 2
@@ -98,17 +103,17 @@ class Blob {
 
       let springAB = {
         constraint: constraintAB,
-        restLength: constraintAB.length,
+        restLength: constraintAB.length
       }
 
       let springAC = {
         constraint: constraintAC,
-        restLength: constraintAC.length,
+        restLength: constraintAC.length
       }
 
       let springAnchorA = {
         constraint: constraintAnchorA,
-        restLength: constraintAnchorA.length,
+        restLength: constraintAnchorA.length
       }
 
       this.springs.push(springAB)
@@ -148,7 +153,7 @@ class Blob {
       case 10:
         // reset state
         this.destScale = this.restScale
-        
+
         if (this.currScale < this.destScale) {
           this.grow()
         } else if (this.currScale > this.destScale) {
@@ -224,24 +229,27 @@ class Blob {
   }
 
   resize(scale) {
-    this.restScale = this.restScale * scale;
+    this.restScale = this.restScale * scale
     this.scaleTo(this.restScale)
   }
 
   grow() {
-    let amount = 1.0075
+    let amount = 1.015
     this.scale(amount)
   }
 
   shrink() {
-    let amount = 1 / 1.0075
+    let amount = 1 / 1.015
     this.scale(amount)
   }
 
   addForce(point, strength = 0.002) {
-    this.bodies.forEach(body => {
+    this.bodies.forEach((body) => {
       let distance = Matter.Vector.sub(body.position, point)
-      let force = Matter.Vector.mult(Matter.Vector.normalise(distance), strength)
+      let force = Matter.Vector.mult(
+        Matter.Vector.normalise(distance),
+        strength
+      )
       Matter.Body.applyForce(body, Matter.Vector.create(), force)
     })
   }
@@ -250,7 +258,10 @@ class Blob {
     let norm = Matter.Vector.normalise(
       Matter.Vector.sub(center, this.anchor.position)
     )
-    let perpendicular = Matter.Vector.rotate(norm, Math.PI * 0.5 * ((Math.random() - 0.5) * 0.1 + 1))
+    let perpendicular = Matter.Vector.rotate(
+      norm,
+      Math.PI * 0.5 * ((Math.random() - 0.5) * 0.1 + 1)
+    )
     let force = Matter.Vector.mult(perpendicular, strength * this.currScale)
 
     Matter.Body.applyForce(this.anchor, this.anchor.position, force)
