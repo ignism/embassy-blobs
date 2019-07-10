@@ -8,7 +8,7 @@ import SVGRender from './svg-render'
 import 'classlist-polyfill'
 
 class MatterApp {
-  constructor(wrapper, embassies, patterns, numBlobs, debug = false) {
+  constructor(wrapper, embassies, patterns, numBlobs, debug = true) {
     this.embassies = embassies
     this.patterns = patterns
     this.wrapper = wrapper
@@ -135,7 +135,7 @@ class MatterApp {
 
     let placementRadius = this.dish.radius / 2
 
-    let rNorm = this.dishSize * 0.4
+    let rNorm = this.dishSize * 0.375
     let blobRadi = [rNorm * 1, rNorm * 0.8, rNorm * 0.7, rNorm * 0.5]
 
     for (let i = 0; i < this.numBlobs; i++) {
@@ -198,13 +198,15 @@ class MatterApp {
   }
 
   hover() {
-    let index = Math.floor(Math.random() * 4)
-    while (index == this.currentBlob) {
-      index = Math.floor(Math.random() * 4)
+    if (this.initialized) {
+      let index = Math.floor(Math.random() * 4)
+      while (index == this.currentBlob) {
+        index = Math.floor(Math.random() * 4)
+      }
+      
+      this.blobs[index].addMovement(this.calcDishOrigin(), 0.1)
+      this.currentBlob = index
     }
-
-    this.blobs[index].addMovement(this.calcDishOrigin(), 1)
-    this.currentBlob = index
   }
 
   highlight(slug) {

@@ -27,25 +27,25 @@ class Blob {
     let initRadius = 24 * this.currScale
 
     let frictionOptions = {
-      friction: 0.001,
+      friction: 0.01,
       frictionAir: 0.01,
-      frictionStatic: 0.0001
+      frictionStatic: 0.01
     }
 
     let circumConstraint = {
-      stiffness: 0.025,
-      damping: 0.8
+      stiffness: 0.0125,
+      damping: 0.375
     }
 
     let anchorConstraint = {
-      stiffness: 0.0025,
-      damping: 0.9
+      stiffness: 0.025,
+      damping: 0.75
     }
 
     this.anchor = Matter.Bodies.circle(
       this.position.x,
       this.position.y,
-      initSize * 2,
+      initSize * 1.5,
       frictionOptions
     )
 
@@ -58,7 +58,7 @@ class Blob {
 
       let x = this.position.x + offset.x
       let y = this.position.y + offset.y
-      let circle = Matter.Bodies.circle(x, y, initSize, frictionOptions)
+      let circle = Matter.Bodies.circle(x, y, initSize, frictionOptions, 12)
 
       this.bodies.push(circle)
     }
@@ -243,26 +243,26 @@ class Blob {
     this.scale(amount)
   }
 
-  moveTo(position) {
-    let strength = 40
-    let offset = Matter.Vector.sub(this.getCenter(), position)
-    let force = Matter.Vector.mult(
-      Matter.Vector.normalise(offset),
-      strength
-    )
-    Matter.Body.applyForce(this.anchor, Matter.Vector.create(), force)
-  }
+  // moveTo(position) {
+  //   let strength = 0.01
+  //   let offset = Matter.Vector.sub(this.getCenter(), position)
+  //   let force = Matter.Vector.mult(
+  //     Matter.Vector.normalise(offset),
+  //     strength
+  //   )
+  //   Matter.Body.applyForce(this.anchor, Matter.Vector.create(), force)
+  // }
 
-  addForce(point, strength = 0.002) {
-    this.bodies.forEach((body) => {
-      let distance = Matter.Vector.sub(body.position, point)
-      let force = Matter.Vector.mult(
-        Matter.Vector.normalise(distance),
-        strength
-      )
-      Matter.Body.applyForce(body, Matter.Vector.create(), force)
-    })
-  }
+  // addForce(point, strength = 0.002) {
+  //   this.bodies.forEach((body) => {
+  //     let distance = Matter.Vector.sub(body.position, point)
+  //     let force = Matter.Vector.mult(
+  //       Matter.Vector.normalise(distance),
+  //       strength
+  //     )
+  //     Matter.Body.applyForce(body, Matter.Vector.create(), force)
+  //   })
+  // }
 
   addMovement(center, strength) {
     let norm = Matter.Vector.normalise(
