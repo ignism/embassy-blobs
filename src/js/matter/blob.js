@@ -28,7 +28,7 @@ class Blob {
 
     let frictionOptions = {
       friction: 0.001,
-      frictionAir: 0.0001,
+      frictionAir: 0.01,
       frictionStatic: 0.0001
     }
 
@@ -243,6 +243,16 @@ class Blob {
     this.scale(amount)
   }
 
+  moveTo(position) {
+    let strength = 40
+    let offset = Matter.Vector.sub(this.getCenter(), position)
+    let force = Matter.Vector.mult(
+      Matter.Vector.normalise(offset),
+      strength
+    )
+    Matter.Body.applyForce(this.anchor, Matter.Vector.create(), force)
+  }
+
   addForce(point, strength = 0.002) {
     this.bodies.forEach((body) => {
       let distance = Matter.Vector.sub(body.position, point)
@@ -254,13 +264,13 @@ class Blob {
     })
   }
 
-  addMovement(center, strength, debug = false) {
+  addMovement(center, strength) {
     let norm = Matter.Vector.normalise(
       Matter.Vector.sub(center, this.anchor.position)
     )
     let perpendicular = Matter.Vector.rotate(
-      norm,
-      Math.PI * 0.5 * ((Math.random() - 0.5) * 0.1 + 1)
+      // norm, Math.PI * 0.5 * ((Math.random() - 0.5) * 0.1 + 1)
+      norm, Math.PI * ((Math.random() > 0.5) ? 1 : -1) * 0.5
     )
     let force = Matter.Vector.mult(perpendicular, strength * this.currScale)
 

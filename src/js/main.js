@@ -15,8 +15,24 @@ const embassies = [
     image: 'https://images.unsplash.com/photo-1561972663-4210a74d4175'
   }
 ]
+
+const patterns = [
+  {
+    image: 'images/pattern-0.svg'
+  },
+  {
+    image: 'images/pattern-1.svg'
+  },
+  {
+    image: 'images/pattern-2.svg'
+  },
+  {
+    image: 'images/pattern-3.svg'
+  }
+]
+
 const wrapper = document.getElementById('blob-app')
-const matterApp = new MatterApp(wrapper, embassies, 4, true)
+const matterApp = new MatterApp(wrapper, embassies, patterns, 4, true)
 const embassyDetail = document.querySelector('.embassy-detail')
 const buttonBack = embassyDetail.querySelector('.button-back')
 const buttonActivate = embassyDetail.querySelector('.button-activate')
@@ -55,6 +71,14 @@ triggers.forEach((trigger) => {
       }
     
     }
+  })
+
+  trigger.addEventListener('mouseenter', (event) => {
+    event.preventDefault()
+
+    let slug = trigger.getAttribute('data-slug')
+
+    matterApp.hover()
   })
 })
 

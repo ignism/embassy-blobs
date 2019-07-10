@@ -8,8 +8,9 @@ import SVGRender from './svg-render'
 import tumult from 'tumult'
 
 class MatterApp {
-  constructor(wrapper, embassies, numBlobs, debug = false) {
+  constructor(wrapper, embassies, patterns, numBlobs, debug = false) {
     this.embassies = embassies
+    this.patterns = patterns
     this.wrapper = wrapper
     this.mouse = Matter.Vector.create()
     this.dishOrigin = this.calcDishOrigin()
@@ -112,6 +113,16 @@ class MatterApp {
     return Matter.Vector.create(x, y)
   }
 
+  randomPositionInDish() {
+    let r = Math.random() * this.calcDishSize()
+    let angle = Math.random() * Math.PI * 2.0
+    let vector = Matter.Vector.create(Math.cos(angle) * r, Math.sin(angle) * r)
+
+    let origin = this.calcDishOrigin()
+
+    return Matter.Vector.add(origin, vector)
+  }
+
   createDish() {
     this.dish.init()
     this.dish.addToWorld(engine.world)
@@ -185,6 +196,16 @@ class MatterApp {
     this.svgRenders.forEach((svgRender) => {
       svgRender.reset()
     })
+  }
+
+  hover() {
+    let index = Math.floor(Math.random() * 4)
+    while (index == this.currentBlob) {
+      index = Math.floor(Math.random() * 4)
+    }
+
+    this.blobs[index].addMovement(this.calcDishOrigin(), 1)
+    this.currentBlob = index
   }
 
   highlight(slug) {
