@@ -237,6 +237,13 @@ class MatterApp {
       this.stop()
       this.svgRenders[this.currentBlob].blowUp()
       this.destroy()
+      let activateEvent = new CustomEvent('activated', {
+        detail: {
+          message: 'activated',
+          slug: this.embassies[this.currentBlob].slug
+        }
+      })
+      this.wrapper.dispatchEvent(activateEvent)
       return true
     }
     return false
@@ -271,7 +278,11 @@ class MatterApp {
       ) {
         this.initialized = true
         this.wrapper.querySelector('#blob-svg-wrapper').style.opacity = 1
-        let initEvent = new CustomEvent('initialized')
+        let initEvent = new CustomEvent('initialized', {
+          detail: {
+            message: 'initialized'
+          }
+        })
         this.wrapper.dispatchEvent(initEvent)
       }
     }

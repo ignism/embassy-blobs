@@ -37,24 +37,28 @@ const embassyDetail = document.querySelector('.embassy-detail')
 const buttonBack = embassyDetail.querySelector('.button-back')
 const buttonActivate = embassyDetail.querySelector('.button-activate')
 
-wrapper.addEventListener('initialized', event => {
-  console.log('blob-app initialized')
+wrapper.addEventListener('initialized', (event) => {
+  console.log(event.detail)
 })
 
-buttonBack.addEventListener('click', event => {
+wrapper.addEventListener('activated', (event) => {
+  console.log(event.detail)
+})
+
+buttonBack.addEventListener('click', (event) => {
   event.preventDefault()
 
   embassyDetail.classList.add('hidden')
   matterApp.reset()
 })
 
-buttonActivate.addEventListener('click', event => {
+buttonActivate.addEventListener('click', (event) => {
   event.preventDefault()
 
   if (matterApp.activate()) {
     // matterApp.activate() returned true als hij succesvel heeft weten te activeren
     // dus je kan dit gebruiken om door te gaan naar volgende pagina
-    console.log('activated')
+    // anders luisteren naar event 'activated' op de wrapper (#blob-app)
   }
 })
 
@@ -66,14 +70,11 @@ triggers.forEach((trigger) => {
     let slug = trigger.getAttribute('data-slug')
 
     if (slug) {
-
-      
       if (matterApp.highlight(slug)) {
         // matterApp.highlight() returned true als hij succesvel heeft weten te highlighten
         embassyDetail.querySelector('h1').innerText = slug
         embassyDetail.classList.remove('hidden')
       }
-    
     }
   })
 
