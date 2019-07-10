@@ -48,27 +48,23 @@ class MatterApp {
 
     let loaderWrapper = document.createElement('div')
     loaderWrapper.setAttribute('id', 'loader-svg-wrapper')
-    // let loaderString = `<svg id="image-model" class="blob-image-loader">
-    // <image 
-    // xlink:href=""
-    // class="blob-image blob-pattern" width="100%" height="100%"></image>
-    // </svg>`
+
     let loaderString = `<div id="image-model" class="blob-image-loader">
-    <img src="" class="blob-image blob-pattern" width="100%" height="100%"/>
+    <img src="" class="blob-image" width="100%" height="100%"/>
     </div>`
 
     let blobWrapper = document.createElement('div')
     blobWrapper.setAttribute('id', 'blob-svg-wrapper')
-    let blobString = `<svg preserveAspectRatio="xMidYMid slice" id="blob-model" class="blob-element">
+    let blobString = `<svg id="blob-model" class="blob-element" preserveAspectRatio="xMidYMid slice">
     <clipPath id="clip-path">
       <path id="path" d=""></path>
     </clipPath>
-    <image clip-path="url(#clip-path)" 
+    <image preserveAspectRatio="xMidYMid slice" clip-path="url(#clip-path)" 
     xlink:href=""
-    class="blob-image blob-pattern" preserveAspectRatio="xMidYMid slice"></image>
-    <image clip-path="url(#clip-path)" 
+    class="blob-image blob-pattern"></image>
+    <image preserveAspectRatio="xMidYMid slice" clip-path="url(#clip-path)" 
     xlink:href=""
-    class="blob-image blob-embassy" preserveAspectRatio="xMidYMid slice"></image>
+    class="blob-image blob-embassy"></image>
     </svg>`
 
     loaderWrapper.innerHTML = loaderString.trim()
@@ -84,22 +80,10 @@ class MatterApp {
     this.embassies.forEach((embassy) => {
       if (embassy.image) {
         let wrapper = document.querySelector('#loader-svg-wrapper')
-        // let svg = wrapper.querySelector('#image-model').cloneNode(true)
-        // svg.setAttribute('id', embassy.slug + '-loader')
-        // let image = svg.querySelector('.blob-image')
-        // image.addEventListener('load', (event) => {
-        //   console.log(event)
-        //   this.preloadedImages++
-        // })
-        // image.setAttribute('xlink:href', embassy.image)
-        // image.data = image.data
-        // wrapper.appendChild(svg)
-
         let model = wrapper.querySelector('#image-model').cloneNode(true)
         model.setAttribute('id', embassy.slug + '-loader')
         let image = model.querySelector('.blob-image')
         image.addEventListener('load', (event) => {
-          console.log(event)
           this.preloadedImages++
         })
         image.setAttribute('src', embassy.image)
@@ -167,7 +151,8 @@ class MatterApp {
       blob.init()
       blob.addToWorld(engine.world)
 
-      let svgRender = new SVGRender(svgWrapper, blob, i)
+      let pattern = this.patterns[i].image
+      let svgRender = new SVGRender(svgWrapper, blob, pattern, i)
       svgRender.init()
 
       this.blobs.push(blob)
@@ -299,8 +284,6 @@ class MatterApp {
           }
         })
         this.wrapper.dispatchEvent(initEvent)
-      } else {
-        // console.log(this.preloadedImages)
       }
     }
 

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400px" height="400px" viewBox="0 0 400 400" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 55.2 (78181) - https://sketchapp.com -->
+    <title>pattern_3</title>
+    <desc>Created with Sketch.</desc>
+    <rect width="400" height="400" fill="#000000" />
+    <g id="pattern_3" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group" transform="translate(-102.000000, 32.000000)" fill="#ffffff">
+            <polygon id="Fill-1" points="134.050308 0 132 8.73856108 480.949692 90 483 81.262436"></polygon>
+            <polygon id="Fill-2" points="505.500462 144 78 120.042074 78.4995378 111 506 134.958932"></polygon>
+            <polygon id="Fill-3" points="520.836783 281 77 171.705604 79.1632166 163 523 272.294396"></polygon>
+            <polygon id="Fill-4" points="0 255.873717 532.643373 337 534 328.126283 1.35662655 247"></polygon>
+        </g>
+    </g>
+</svg>

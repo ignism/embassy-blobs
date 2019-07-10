@@ -18,16 +18,16 @@ const embassies = [
 
 const patterns = [
   {
-    image: 'images/pattern-0.svg'
+    image: 'images/pattern-0.png'
   },
   {
-    image: 'images/pattern-1.svg'
+    image: 'images/pattern-1.png'
   },
   {
-    image: 'images/pattern-2.svg'
+    image: 'images/pattern-2.png'
   },
   {
-    image: 'images/pattern-3.svg'
+    image: 'images/pattern-3.png'
   }
 ]
 

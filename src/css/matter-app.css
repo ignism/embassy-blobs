@@ -40,6 +40,16 @@
   transition: opacity 400ms ease-out;
 }
 
+.blob-pattern.slice-vertical {
+  width: auto;
+  height: 100%;
+}
+
+.blob-pattern.slice-horizontal {
+  width: 100%;
+  height: auto;
+}
+
 .active .blob-embassy {
   opacity: 1;
 }

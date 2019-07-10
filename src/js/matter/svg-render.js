@@ -1,7 +1,7 @@
 import Matter from 'matter-js'
 
 class SVGRender {
-  constructor(wrapper, blob, index) {
+  constructor(wrapper, blob, pattern, index) {
     this.wrapper = wrapper
     this.blob = blob
     this.blowUpPositions = []
@@ -14,7 +14,7 @@ class SVGRender {
 
     let patternImage = element.querySelector('image.blob-pattern')
     patternImage.setAttribute('clip-path', 'url(#clip-path-' + index + ')')
-    patternImage.setAttribute('xlink:href', 'images/pattern-' + index + '.svg')
+    patternImage.setAttribute('xlink:href', pattern)
     patternImage.setAttribute('width', '100%')
     patternImage.setAttribute('height', '100%')
 
