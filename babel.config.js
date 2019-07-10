@@ -7,7 +7,8 @@ module.exports = function (api) {
         modules: false,
         targets: {
           browsers: ['> 0.5%', 'last 5 versions', 'ie >= 10']
-        }
+        },
+        useBuiltIns: 'usage'
       }
     ]
   ]

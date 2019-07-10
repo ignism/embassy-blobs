@@ -49,9 +49,10 @@
     "webpack-merge": "^4.2.1"
   },
   "dependencies": {
+    "@babel/polyfill": "^7.4.4",
+    "classlist-polyfill": "^1.2.0",
     "lodash-es": "^4.17.11",
     "matter-js": "^0.14.2",
-    "point-in-polygon": "^1.0.1",
-    "tumult": "^3.0.12"
+    "point-in-polygon": "^1.0.1"
   }
 }

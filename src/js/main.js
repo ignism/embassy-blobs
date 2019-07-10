@@ -4,15 +4,18 @@ import '../css/matter-app.css'
 const embassies = [
   {
     slug: 'embassy-1',
-    image: 'https://images.unsplash.com/photo-1561972661-8b9a2ace559a'
+    // image: 'https://images.unsplash.com/photo-1561972661-8b9a2ace559a'
+    image: 'images/embassy-0.jpg'
   },
   {
     slug: 'embassy-2',
-    image: 'https://images.unsplash.com/photo-1561913620-d9801a50ba88'
+    // image: 'https://images.unsplash.com/photo-1561913620-d9801a50ba88'
+    image: 'images/embassy-1.jpg'
   },
   {
     slug: 'embassy-3',
-    image: 'https://images.unsplash.com/photo-1561972663-4210a74d4175'
+    // image: 'https://images.unsplash.com/photo-1561972663-4210a74d4175'
+    image: 'images/embassy-2.jpg'
   }
 ]
 

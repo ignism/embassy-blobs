@@ -148,7 +148,9 @@ class SVGRender {
 
   setBackgroundImage(image) {
     let embassyImage = this.element.querySelector('image.blob-embassy')
-    embassyImage.setAttribute('xlink:href', image)
+    // embassyImage.setAttribute('xlink:href', image)
+    embassyImage.setAttributeNS('http://www.w3.org/1999/xlink', 'href', image)
+    // getAttributeNS('http://www.w3.org/1999/xlink', 'href');
     this.element.classList.add('active')
   }
 

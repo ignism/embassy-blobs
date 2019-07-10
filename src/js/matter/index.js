@@ -5,7 +5,7 @@ import CanvasRender from './canvas-render'
 import Blob from './blob'
 import Dish from './dish'
 import SVGRender from './svg-render'
-import tumult from 'tumult'
+import 'classlist-polyfill'
 
 class MatterApp {
   constructor(wrapper, embassies, patterns, numBlobs, debug = false) {
@@ -24,7 +24,6 @@ class MatterApp {
     this.debug = debug
     this.blobsInitialized = false
     this.initialized = false
-    this.noise = new tumult.Simplex1('seed')
     this.ticker = 0
     this.isScaling = false
     this.currentBlob = -1
@@ -333,5 +332,19 @@ class MatterApp {
     this.svgRenders[index].setBackgroundImage(image)
   }
 }
+
+(function () {
+
+  if ( typeof window.CustomEvent === "function" ) return false;
+
+  function CustomEvent ( event, params ) {
+    params = params || { bubbles: false, cancelable: false, detail: null };
+    var evt = document.createEvent( 'CustomEvent' );
+    evt.initCustomEvent( event, params.bubbles, params.cancelable, params.detail );
+    return evt;
+   }
+
+  window.CustomEvent = CustomEvent;
+})();
 
 export default MatterApp
