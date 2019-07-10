@@ -37,6 +37,10 @@ const embassyDetail = document.querySelector('.embassy-detail')
 const buttonBack = embassyDetail.querySelector('.button-back')
 const buttonActivate = embassyDetail.querySelector('.button-activate')
 
+wrapper.addEventListener('initialized', event => {
+  console.log('blob-app initialized')
+})
+
 buttonBack.addEventListener('click', event => {
   event.preventDefault()
 

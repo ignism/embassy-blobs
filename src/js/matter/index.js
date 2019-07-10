@@ -271,6 +271,8 @@ class MatterApp {
       ) {
         this.initialized = true
         this.wrapper.querySelector('#blob-svg-wrapper').style.opacity = 1
+        let initEvent = new CustomEvent('initialized')
+        this.wrapper.dispatchEvent(initEvent)
       }
     }
 
