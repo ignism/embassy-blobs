@@ -10,7 +10,7 @@ class Blob {
   constructor(position, num, radius) {
     this.position = position
     this.num = num
-    this.size = 6
+    this.size = 5.5
     this.radius = radius
     this.currScale = 1
     this.destScale = 1
@@ -27,25 +27,28 @@ class Blob {
     let initRadius = 24 * this.currScale
 
     let frictionOptions = {
-      friction: 0.01,
-      frictionAir: 0.01,
-      frictionStatic: 0.01
+      friction: 0.8,
+      frictionAir: 0.1,
+      frictionStatic: 0.1,
+      density: 0.1,
+      restitution: 0
     }
 
     let circumConstraint = {
-      stiffness: 0.0125,
-      damping: 0.375
+      stiffness: 0.025,
+      damping: 0.01
     }
 
     let anchorConstraint = {
-      stiffness: 0.025,
-      damping: 0.75
+      stiffness: 0.0025,
+      damping: 0.01
     }
 
-    this.anchor = Matter.Bodies.circle(
+    this.anchor = Matter.Bodies.polygon(
       this.position.x,
       this.position.y,
-      initSize * 1.5,
+      12,
+      initSize * 2,
       frictionOptions
     )
 
@@ -58,7 +61,7 @@ class Blob {
 
       let x = this.position.x + offset.x
       let y = this.position.y + offset.y
-      let circle = Matter.Bodies.circle(x, y, initSize, frictionOptions, 12)
+      let circle = Matter.Bodies.polygon(x, y, 12, initSize, frictionOptions)
 
       this.bodies.push(circle)
     }
@@ -138,12 +141,14 @@ class Blob {
     switch (this.state) {
       case 0:
         // init state
-        if (this.currScale < this.restScale) {
+        this.destScale = this.restScale
+        if (this.currScale < (this.restScale - 0.01)) {
           this.grow()
         } else {
           this.springs.forEach((spring) => {
             spring.restLength = spring.constraint.length
           })
+
           this.state++
         }
         break
@@ -169,7 +174,7 @@ class Blob {
       case 20:
         // grow state
         if (this.currScale < this.destScale) {
-          this.grow()
+          this.grow(400)
         } else {
           this.state = 1
         }
@@ -177,7 +182,7 @@ class Blob {
       case 21:
         // shrink state
         if (this.currScale > this.destScale) {
-          this.shrink()
+          this.shrink(600)
         } else {
           this.state = 1
         }
@@ -186,9 +191,14 @@ class Blob {
   }
 
   reset() {
-    this.destScale = 1
+    this.destScale = this.restScale
     this.isMouseOver = false
-    this.state = 10
+
+    if (this.currScale < this.destScale) {
+      this.state = 20
+    } else {
+      this.state = 21
+    }
   }
 
   getCenter() {
@@ -216,7 +226,7 @@ class Blob {
   }
 
   scale(amount) {
-    this.currScale *= amount
+    this.currScale *= amount 
 
     this.springs.forEach((spring) => {
       spring.constraint.length *= amount
@@ -233,13 +243,21 @@ class Blob {
     this.scaleTo(this.restScale)
   }
 
-  grow() {
-    let amount = 1.015
+  grow(strength = 100) {
+    // let amount = strength
+    let diff = this.destScale - this.currScale
+    let amount = 1 + (diff / strength)
+
+
     this.scale(amount)
   }
 
-  shrink() {
-    let amount = 1 / 1.015
+  shrink(strength = 100) {
+    // let amount = 1 / strength
+
+    let diff = this.destScale - this.currScale
+    let amount = 1 + (diff / strength)
+
     this.scale(amount)
   }
 

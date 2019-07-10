@@ -33,7 +33,10 @@ class Dish {
       let y = this.position.y + offset.y
       let rectangle = Matter.Bodies.rectangle(x, y, w, 1, {
         angle: angle + Math.PI / 2,
-        isStatic: true
+        isStatic: true,
+        friction: 0.0,
+        frictionAir: 0.01,
+        frictionStatic: 0.0
       })
 
       this.bodies.push(rectangle)

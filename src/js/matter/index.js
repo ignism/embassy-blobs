@@ -8,7 +8,7 @@ import SVGRender from './svg-render'
 import 'classlist-polyfill'
 
 class MatterApp {
-  constructor(wrapper, embassies, patterns, numBlobs, debug = true) {
+  constructor(wrapper, embassies, patterns, numBlobs, debug = false) {
     this.embassies = embassies
     this.patterns = patterns
     this.wrapper = wrapper
@@ -30,6 +30,14 @@ class MatterApp {
     this.preloadedImages = 0
     this.isRunning = true
     this.throttledResize = throttle(this.resize.bind(this), 200)
+    this.throttleFPS = {
+      fps: 0,
+      fpsInterval: 0,
+      startTime: 0,
+      now: 0,
+      then: 0,
+      elapsed: 0
+    }
 
     if (debug) {
       this.canvasRender = new CanvasRender(
@@ -94,7 +102,13 @@ class MatterApp {
     this.createBlobs()
     this.addEventListeners()
 
+    this.throttleFPS.fps = 60
+    this.throttleFPS.fpsInterval = 1000 / this.throttleFPS.fps
+    this.throttleFPS.then = Date.now()
+    this.throttleFPS.startTime = this.throttleFPS.then
     this.animate()
+
+    console.log(engine.positionIterations)
   }
 
   calcDishSize() {
@@ -135,7 +149,7 @@ class MatterApp {
 
     let placementRadius = this.dish.radius / 2
 
-    let rNorm = this.dishSize * 0.375
+    let rNorm = this.dishSize * 0.3725
     let blobRadi = [rNorm * 1, rNorm * 0.8, rNorm * 0.7, rNorm * 0.5]
 
     for (let i = 0; i < this.numBlobs; i++) {
@@ -199,11 +213,12 @@ class MatterApp {
 
   hover() {
     if (this.initialized) {
+
       let index = Math.floor(Math.random() * 4)
       while (index == this.currentBlob) {
         index = Math.floor(Math.random() * 4)
       }
-      
+
       this.blobs[index].addMovement(this.calcDishOrigin(), 0.1)
       this.currentBlob = index
     }
@@ -265,9 +280,25 @@ class MatterApp {
 
   animate() {
     if (this.isRunning) {
-      this.update()
-      this.draw()
       window.requestAnimationFrame(this.animate.bind(this))
+
+      this.dish.update()
+      this.dishOuter.update()
+
+      this.throttleFPS.now = Date.now()
+      this.throttleFPS.elapsed = this.throttleFPS.now - this.throttleFPS.then
+
+
+
+      if (this.throttleFPS.elapsed > this.throttleFPS.fpsInterval) {
+
+        this.throttleFPS.then =
+          this.throttleFPS.now -
+          this.throttleFPS.elapsed % this.throttleFPS.fpsInterval
+
+        this.update()
+        this.draw()
+      }
     }
   }
 
@@ -334,19 +365,21 @@ class MatterApp {
     this.svgRenders[index].setBackgroundImage(image)
   }
 }
+;(function() {
+  if (typeof window.CustomEvent === 'function') return false
 
-(function () {
+  function CustomEvent(event, params) {
+    params = params || {
+      bubbles: false,
+      cancelable: false,
+      detail: null
+    }
+    var evt = document.createEvent('CustomEvent')
+    evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail)
+    return evt
+  }
 
-  if ( typeof window.CustomEvent === "function" ) return false;
-
-  function CustomEvent ( event, params ) {
-    params = params || { bubbles: false, cancelable: false, detail: null };
-    var evt = document.createEvent( 'CustomEvent' );
-    evt.initCustomEvent( event, params.bubbles, params.cancelable, params.detail );
-    return evt;
-   }
-
-  window.CustomEvent = CustomEvent;
-})();
+  window.CustomEvent = CustomEvent
+})()
 
 export default MatterApp
