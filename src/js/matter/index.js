@@ -218,7 +218,7 @@ class MatterApp {
               index = Math.floor(Math.random() * 4)
             }
 
-            let scale = this.wrapper.clientWidth * this.dishSize / 24 * 0.65
+            let scale = this.dishSize / 24 * 0.65
 
             this.scaleBlob(index, scale)
             this.setBlobBackground(index, embassy.image)
