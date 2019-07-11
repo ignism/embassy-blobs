@@ -78,7 +78,7 @@ class MatterApp {
     blobWrapper.innerHTML = blobString.trim()
 
     loaderWrapper.style.opacity = 0
-    blobWrapper.style.opacity = 0
+    // blobWrapper.style.opacity = 0
     blobWrapper.style.transition = '500ms ease-out'
 
     this.wrapper.appendChild(loaderWrapper)
@@ -309,7 +309,7 @@ class MatterApp {
         this.preloadedImages === this.embassies.length
       ) {
         this.initialized = true
-        this.wrapper.querySelector('#blob-svg-wrapper').style.opacity = 1
+        // this.wrapper.querySelector('#blob-svg-wrapper').style.opacity = 1
         let initEvent = new CustomEvent('initialized', {
           detail: {
             message: 'initialized'
