@@ -354,7 +354,7 @@ class MatterApp {
         blob.scaleTo(amount)
       } else {
         let negativeAmount = 1 / relativeScale
-        let normalized = 1 - (1 - negativeAmount) / 1
+        let normalized = 1 - ((1 - negativeAmount) / 2)
         let scale = blob.restScale * normalized
         blob.scaleTo(scale)
       }

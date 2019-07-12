@@ -40,7 +40,7 @@ class Blob {
     }
 
     let anchorConstraint = {
-      stiffness: 0.0025,
+      stiffness: 0.0000125,
       damping: 0.01
     }
 
