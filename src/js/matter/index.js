@@ -251,14 +251,7 @@ class MatterApp {
 
   hover() {
     if (this.initialized) {
-
-      let index = Math.floor(Math.random() * 4)
-      while (index == this.currentBlob) {
-        index = Math.floor(Math.random() * 4)
-      }
-
-      this.blobs[index].addMovement(this.calcDishOrigin(), 0.1)
-      this.currentBlob = index
+      this.randomizeScales()
     }
   }
 
