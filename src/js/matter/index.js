@@ -21,13 +21,14 @@ class MatterApp {
     this.rNorm = this.dishSize * 0.6
     this.blobRadi = [this.rNorm * 1, this.rNorm * 0.8, this.rNorm * 0.7, this.rNorm * 0.5]
     this.blobScales = [this.rNorm * 1 / 24, this.rNorm * 0.8 / 24, this.rNorm * 0.7 / 24, this.rNorm * 0.5 / 24]
+    this.highlightScales = [this.rNorm * 1.25 / 24, this.rNorm * 0.7 / 24, this.rNorm * 0.6 / 24, this.rNorm * 0.45 / 24]
     this.blobs = []
     this.overblob = -1
     this.svgRenders = []
     this.debug = debug
     this.blobsInitialized = false
     this.initialized = false
-    this.ticker = 0
+    // this.ticker = 0
     this.isScaling = false
     this.currentBlob = -1
     this.preloadedImages = 0
@@ -215,6 +216,14 @@ class MatterApp {
         if (blob.isInside(mouse)) {
           if (key != this.overblob) {
             this.randomizeScales(key)
+
+            let mouseoverEvent = new CustomEvent('mouseover', {
+              detail: {
+                message: 'mouseover',
+                blobIndex: key
+              }
+            })
+            this.wrapper.dispatchEvent(mouseoverEvent)
           }
           
           this.overblob = key
@@ -265,9 +274,10 @@ class MatterApp {
               index = Math.floor(Math.random() * 4)
             }
 
-            let scale = this.dishSize / 24 * 0.65
+            // let scale = this.dishSize / 24 * 0.65
+            // this.scaleBlob(index, scale)
 
-            this.scaleBlob(index, scale)
+            this.highlightBlob(index)
             this.setBlobBackground(index, embassy.image)
             this.currentBlob = index
           }
@@ -395,7 +405,6 @@ class MatterApp {
         blob.scaleTo(randomScales[key])
       })
     } else {
-      console.log('deze')
       for (let i = 1; i < this.blobScales.length; i++) {
         indexes.push(i)
       }
@@ -409,9 +418,32 @@ class MatterApp {
       }
 
       randomScales.splice(index, 0, this.blobScales[0])
-
-      console.log(randomScales)
     
+      this.blobs.forEach((blob, key) => {
+        blob.scaleTo(randomScales[key])
+      })
+    }
+  }
+
+  highlightBlob(index = -1) {
+    let indexes = []
+    let randomScales = []
+
+    if (index == - 1) {
+      return false
+    } else {
+      for (let i = 1; i < this.highlightScales.length; i++) {
+        indexes.push(i)
+      }
+
+      for (let i = 1; i < this.highlightScales.length; i++) {
+        let randomIndex = Math.floor(Math.random() * indexes.length)
+        randomScales.push(this.highlightScales[indexes[randomIndex]])
+        indexes.splice(randomIndex, 1)
+      }
+
+      randomScales.splice(index, 0, this.highlightScales[0])
+
       this.blobs.forEach((blob, key) => {
         blob.scaleTo(randomScales[key])
       })

@@ -48,6 +48,10 @@ wrapper.addEventListener('activated', (event) => {
   console.log(event.detail)
 })
 
+wrapper.addEventListener('mouseover', (event) => {
+  console.log(event.detail)
+})
+
 // debug
 wrapper.addEventListener('click', (event) => {
   console.log(event.detail)

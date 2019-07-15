@@ -49,7 +49,7 @@ class Blob {
       this.position.x,
       this.position.y,
       12,
-      initSize * 2,
+      initSize * 4,
       frictionOptions
     )
 
