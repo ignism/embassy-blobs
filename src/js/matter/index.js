@@ -112,8 +112,6 @@ class MatterApp {
     this.throttleFPS.then = Date.now()
     this.throttleFPS.startTime = this.throttleFPS.then
     this.animate()
-
-    console.log(engine.positionIterations)
   }
 
   calcDishSize() {
@@ -352,10 +350,6 @@ class MatterApp {
           }
         })
         this.wrapper.dispatchEvent(initEvent)
-
-        this.blobs.forEach(blob => {
-          console.log(blob.currScale)
-        })
       }
     }
 
