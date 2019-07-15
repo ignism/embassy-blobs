@@ -33,6 +33,7 @@ class MatterApp {
     this.preloadedImages = 0
     this.isRunning = true
     this.throttledResize = throttle(this.resize.bind(this), 200)
+    this.throttledMousemove = throttle(this.mousemove.bind(this), 200)
     this.throttleFPS = {
       fps: 0,
       fpsInterval: 0,
@@ -175,6 +176,7 @@ class MatterApp {
 
   addEventListeners() {
     window.addEventListener('resize', this.throttledResize, true)
+    this.wrapper.addEventListener('mousemove', this.throttledMousemove, true)
   }
 
   resize() {
@@ -200,6 +202,35 @@ class MatterApp {
       this.dishOuter.resizeTo(this.dishSize + 4)
     }
   }
+
+  mousemove(event) {
+    if (this.initialized) {
+      let offsetLeft = offset(this.wrapper).left
+      let mouse = {
+        x: event.clientX - offsetLeft,
+        y: event.clientY
+      }
+
+      this.blobs.forEach((blob, key) => {
+        if (blob.isInside(mouse)) {
+          if (key != this.overblob) {
+            this.randomizeScales(key)
+          }
+          
+          this.overblob = key
+        }
+      })
+    }
+    return false;
+  }
+
+  destroy() {
+    window.removeEventListener('resize', this.throttledResize, false)
+    this.wrapper.removeEventListener('mousemove', this.throttledMousemove, false)
+
+    this.stop()
+  }
+
 
   reset() {
     this.blobs.forEach((blob) => {
@@ -271,11 +302,6 @@ class MatterApp {
 
   stop() {
     this.isRunning = false
-  }
-
-  destroy() {
-    window.removeEventListener('resize', this.throttledResize, false)
-    this.stop()
   }
 
   animate() {
@@ -350,23 +376,46 @@ class MatterApp {
     })
   }
 
-  randomizeScales() {
+  randomizeScales(index = -1) {
     let indexes = []
     let randomScales = []
 
-    for (let i = 0; i < this.blobScales.length; i++) {
-      indexes.push(i)
-    }
+    if (index == - 1) {
+      for (let i = 0; i < this.blobScales.length; i++) {
+        indexes.push(i)
+      }
 
-    for (let i = 0; i < this.blobScales.length; i++) {
-      let randomIndex = Math.floor(Math.random() * indexes.length)
-      randomScales.push(this.blobScales[indexes[randomIndex]])
-      indexes.splice(randomIndex, 1)
-    }
+      for (let i = 0; i < this.blobScales.length; i++) {
+        let randomIndex = Math.floor(Math.random() * indexes.length)
+        randomScales.push(this.blobScales[indexes[randomIndex]])
+        indexes.splice(randomIndex, 1)
+      }
 
-    this.blobs.forEach((blob, key) => {
-      blob.scaleTo(randomScales[key])
-    })
+      this.blobs.forEach((blob, key) => {
+        blob.scaleTo(randomScales[key])
+      })
+    } else {
+      console.log('deze')
+      for (let i = 1; i < this.blobScales.length; i++) {
+        indexes.push(i)
+      }
+
+      // randomScales.push(this.blobScales[0])
+
+      for (let i = 1; i < this.blobScales.length; i++) {
+        let randomIndex = Math.floor(Math.random() * indexes.length)
+        randomScales.push(this.blobScales[indexes[randomIndex]])
+        indexes.splice(randomIndex, 1)
+      }
+
+      randomScales.splice(index, 0, this.blobScales[0])
+
+      console.log(randomScales)
+    
+      this.blobs.forEach((blob, key) => {
+        blob.scaleTo(randomScales[key])
+      })
+    }
   }
 
   scaleBlob(index, amount) {
@@ -404,5 +453,12 @@ class MatterApp {
 
   window.CustomEvent = CustomEvent
 })()
+
+function offset(el) {
+  var rect = el.getBoundingClientRect(),
+  scrollLeft = window.pageXOffset || document.documentElement.scrollLeft,
+  scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+  return { top: rect.top + scrollTop, left: rect.left + scrollLeft }
+}
 
 export default MatterApp
