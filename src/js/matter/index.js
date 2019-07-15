@@ -121,10 +121,10 @@ class MatterApp {
   }
 
   calcDishOrigin() {
-    let w = this.wrapper.clientWidth
     let s = this.calcDishSize()
-    let x = w * 0.05 + s
-    let y = this.wrapper.clientHeight * 0.45
+    let margin = this.wrapper.clientWidth * 0.05
+    let x = margin + s
+    let y = this.wrapper.clientHeight - margin - s
     return Matter.Vector.create(x, y)
   }
 
