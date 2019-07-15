@@ -7,7 +7,7 @@ let Smoothed = function(current, dest, smoothing) {
 }
 
 class Blob {
-  constructor(position, num, restScale) {
+  constructor(position, num, restScale, dishSize, dishOrigin) {
     this.position = position
     this.num = num
     this.size = 2.75
@@ -20,6 +20,8 @@ class Blob {
     this.springs = []
     this.state = 0
     this.anchor
+    this.dishSize = dishSize
+    this.dishOrigin = dishOrigin
   }
 
   init() {
@@ -305,6 +307,21 @@ class Blob {
     })
 
     return inside([point.x, point.y], polygon)
+  }
+
+  keepInsideDish() {
+    this.bodies.forEach(body => {
+      let distance = Matter.Vector.sub(body.position, this.dishOrigin)
+      let offset = Matter.Vector.magnitude(distance)
+      
+      if (offset > this.dishSize) {
+        console.log('keep ' + this.dishSize)
+        console.log('offset ' + offset)
+        let direction = Matter.Vector.normalise(distance)
+        let newPosition = Matter.Vector.mult(direction, (this.dishSize - 10))
+        Matter.Body.setPosition(body, newPosition)
+      }
+    })
   }
 }
 

@@ -160,7 +160,7 @@ class MatterApp {
       )
 
       let blobScale = this.blobScales[i % this.blobScales.length]
-      let blob = new Blob(position, blobSegments, blobScale)
+      let blob = new Blob(position, blobSegments, blobScale, this.dishSize, this.dishOrigin)
       blob.init()
       blob.addToWorld(engine.world)
 
@@ -185,16 +185,26 @@ class MatterApp {
 
     if (this.initialized) {
       let dishOrigin = this.calcDishOrigin()
+      let dishSize = this.calcDishSize()
 
       this.dish.moveTo(dishOrigin)
       this.dishOuter.moveTo(dishOrigin)
 
-      this.dishSize = this.calcDishSize()
-      let dishScale = this.dishSize / this.dish.radius
-      let blobScale = 1 + (dishScale - 1) * 0.66667
+      this.dishSize = dishSize
+      this.rNorm = this.dishSize * 0.6
+      this.blobScales = [this.rNorm * 1 / 24, this.rNorm * 0.8 / 24, this.rNorm * 0.7 / 24, this.rNorm * 0.5 / 24]
 
-      this.blobs.forEach((blob) => {
-        blob.resize(blobScale)
+      // let dishScale = this.dishSize / this.dish.radius
+      // let blobScale = 1 + (dishScale - 1) * 0.66667
+
+      // this.blobs.forEach((blob) => {
+      //   blob.resize(blobScale)
+      // })
+
+      this.blobs.forEach((blob, key) => {
+        blob.dishSize = dishSize
+        blob.dishOrigin = dishOrigin
+        blob.scaleTo(this.blobScales[key])
       })
 
       this.dish.resizeTo(this.dishSize)

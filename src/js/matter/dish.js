@@ -57,13 +57,15 @@ class Dish {
     // }
 
     let targetScale = this.targetRadius / this.radius
+    
     if (Math.abs(targetScale - 1) > 0.001) {
       let offset = Matter.Vector.sub(this.targetPosition, this.position)
-      offset = Matter.Vector.mult(offset, 0.1)
+      offset = Matter.Vector.mult(offset, 0.01)
       this.position = Matter.Vector.add(this.position, offset)
 
-      let scaleStep = (targetScale - 1) * 0.1
+      let scaleStep = (targetScale - 1) * 0.01
       let scale = 1 + scaleStep
+
       this.radius *= scale
 
       this.bodies.forEach((body) => {
