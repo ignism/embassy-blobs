@@ -48,6 +48,13 @@ wrapper.addEventListener('activated', (event) => {
   console.log(event.detail)
 })
 
+// debug
+wrapper.addEventListener('click', (event) => {
+  console.log(event.detail)
+  matterApp.randomizeScales()
+})
+
+
 buttonBack.addEventListener('click', (event) => {
   event.preventDefault()
 

@@ -7,14 +7,15 @@ let Smoothed = function(current, dest, smoothing) {
 }
 
 class Blob {
-  constructor(position, num, radius) {
+  constructor(position, num, restScale) {
     this.position = position
     this.num = num
-    this.size = 5.5
-    this.radius = radius
+    this.size = 2.75
+    this.radius = restScale * 24
     this.currScale = 1
     this.destScale = 1
-    this.restScale = radius / 24
+    // this.restScale = radius / 24
+    this.restScale = restScale
     this.bodies = []
     this.springs = []
     this.state = 0
@@ -36,12 +37,12 @@ class Blob {
 
     let circumConstraint = {
       stiffness: 0.025,
-      damping: 0.01
+      damping: 0.1
     }
 
     let anchorConstraint = {
-      stiffness: 0.0000125,
-      damping: 0.01
+      stiffness: 0.000125,
+      damping: 0.001
     }
 
     this.anchor = Matter.Bodies.polygon(

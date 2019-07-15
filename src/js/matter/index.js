@@ -18,6 +18,9 @@ class MatterApp {
     this.dish = new Dish(this.dishOrigin, 24, this.dishSize)
     this.dishOuter = new Dish(this.dishOrigin, 24, this.dishSize + 4)
     this.numBlobs = numBlobs
+    this.rNorm = this.dishSize * 0.6
+    this.blobRadi = [this.rNorm * 1, this.rNorm * 0.8, this.rNorm * 0.7, this.rNorm * 0.5]
+    this.blobScales = [this.rNorm * 1 / 24, this.rNorm * 0.8 / 24, this.rNorm * 0.7 / 24, this.rNorm * 0.5 / 24]
     this.blobs = []
     this.overblob = -1
     this.svgRenders = []
@@ -143,14 +146,11 @@ class MatterApp {
   }
 
   createBlobs() {
-    let blobSegments = 12
+    let blobSegments = 24
 
     let svgWrapper = this.wrapper.querySelector('#blob-svg-wrapper')
 
     let placementRadius = this.dish.radius / 2
-
-    let rNorm = this.dishSize * 0.3725
-    let blobRadi = [rNorm * 1, rNorm * 0.8, rNorm * 0.7, rNorm * 0.5]
 
     for (let i = 0; i < this.numBlobs; i++) {
       let angle = i / this.numBlobs * Math.PI * 2
@@ -159,8 +159,8 @@ class MatterApp {
         this.dishOrigin.y + Math.sin(angle) * placementRadius
       )
 
-      let blobRadius = blobRadi[i % blobRadi.length] * 1.25
-      let blob = new Blob(position, blobSegments, blobRadius)
+      let blobScale = this.blobScales[i % this.blobScales.length]
+      let blob = new Blob(position, blobSegments, blobScale)
       blob.init()
       blob.addToWorld(engine.world)
 
@@ -316,6 +316,10 @@ class MatterApp {
           }
         })
         this.wrapper.dispatchEvent(initEvent)
+
+        this.blobs.forEach(blob => {
+          console.log(blob.currScale)
+        })
       }
     }
 
@@ -343,6 +347,25 @@ class MatterApp {
   draw() {
     this.svgRenders.forEach((svgRender) => {
       svgRender.draw()
+    })
+  }
+
+  randomizeScales() {
+    let indexes = []
+    let randomScales = []
+
+    for (let i = 0; i < this.blobScales.length; i++) {
+      indexes.push(i)
+    }
+
+    for (let i = 0; i < this.blobScales.length; i++) {
+      let randomIndex = Math.floor(Math.random() * indexes.length)
+      randomScales.push(this.blobScales[indexes[randomIndex]])
+      indexes.splice(randomIndex, 1)
+    }
+
+    this.blobs.forEach((blob, key) => {
+      blob.scaleTo(randomScales[key])
     })
   }
 
