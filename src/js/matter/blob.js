@@ -35,7 +35,7 @@ class Blob {
 
     let frictionOptions = {
       friction: 0.08,
-      frictionAir: 0.25,
+      frictionAir: 0.125,
       frictionStatic: 0.01,
       density: 0.1,
       restitution: 0
@@ -55,7 +55,7 @@ class Blob {
       this.position.x,
       this.position.y,
       12,
-      initSize * 3,
+      initSize * 2.5,
       frictionOptions
     )
 
