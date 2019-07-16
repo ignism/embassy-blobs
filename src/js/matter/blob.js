@@ -12,6 +12,7 @@ class Blob {
     this.num = 20
     this.size = 3.75
     this.radius = restScale * 24
+    this.fromScale = 1
     this.currScale = 1
     this.destScale = 1
     // this.restScale = radius / 24
@@ -149,7 +150,7 @@ class Blob {
       case 0:
         // init state
         this.destScale = this.restScale
-        if (this.currScale < (this.restScale - 0.01)) {
+        if (this.currScale < (this.restScale - 0.1)) {
           this.grow()
         } else {
           this.springs.forEach((spring) => {
@@ -183,7 +184,7 @@ class Blob {
         break
       case 20:
         // grow state
-        if (this.currScale < (this.destScale - 0.01)) {
+        if (this.currScale < (this.destScale - 0.1)) {
           this.grow(600)
         } else {
           this.state = 1
@@ -191,7 +192,7 @@ class Blob {
         break
       case 21:
         // shrink state
-        if (this.currScale > (this.destScale + 0.01)) {
+        if (this.currScale > (this.destScale + 0.1)) {
           this.shrink(400)
         } else {
           this.state = 1
@@ -226,6 +227,7 @@ class Blob {
   }
 
   scaleTo(multiplier) {
+    this.fromScale = this.currScale
     this.destScale = multiplier
 
     if (this.destScale > this.currScale) {
@@ -254,20 +256,35 @@ class Blob {
   }
 
   grow(strength = 200) {
-    // let amount = strength
-    let diff = this.destScale - this.currScale
-    let amount = 1 + (diff / strength)
+    // let diff = this.destScale - this.currScale
 
+    // let amount = 1 + (diff / strength)
 
+    let diff = this.destScale - this.fromScale
+    let step = this.currScale - this.fromScale
+    step = step < 2 ? 2 : step;  
+
+    let smooth = (Math.cos((step / diff * Math.PI * 2) + Math.PI) + 1) * 0.5
+    let amount = 1 + smooth / 100
+
+    amount = amount < 1.0025 ? 1.0025 : amount
     this.scale(amount)
   }
 
   shrink(strength = 200) {
-    // let amount = 1 / strength
+    // let diff = this.destScale - this.currScale
+    // let amount = 1 + (diff / strength)
 
-    let diff = this.destScale - this.currScale
-    let amount = 1 + (diff / strength)
+    // this.scale(amount)
 
+    let diff = this.destScale - this.fromScale
+    let step = this.currScale - this.fromScale
+    step = step < 2 ? 2 : step;  
+
+    let smooth = (Math.cos((step / diff * Math.PI * 2) + Math.PI) + 1) * 0.5
+    let amount = 1 + smooth / 100
+
+    amount = amount > 0.9925 ? 0.9925 : amount
     this.scale(amount)
   }
 
