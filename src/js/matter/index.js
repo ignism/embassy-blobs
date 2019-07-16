@@ -10,6 +10,7 @@ import 'classlist-polyfill'
 class MatterApp {
   constructor(wrapper, embassies, patterns, numBlobs, debug = false) {
     this.embassies = embassies
+    this.currentEmbassy = -1
     this.patterns = patterns
     this.wrapper = wrapper
     this.mouse = Matter.Vector.create()
@@ -18,7 +19,7 @@ class MatterApp {
     this.dish = new Dish(this.dishOrigin, 24, this.dishSize)
     this.dishOuter = new Dish(this.dishOrigin, 24, this.dishSize + 4)
     this.numBlobs = numBlobs
-    this.rNorm = this.dishSize * 0.525
+    this.rNorm = this.dishSize * 0.55
     this.blobRadi = [this.rNorm * 1, this.rNorm * 0.8, this.rNorm * 0.7, this.rNorm * 0.5]
     this.blobScales = [this.rNorm * 1 / 24, this.rNorm * 0.8 / 24, this.rNorm * 0.7 / 24, this.rNorm * 0.5 / 24]
     this.highlightScales = [this.rNorm * 1.25 / 24, this.rNorm * 0.65 / 24, this.rNorm * 0.55 / 24, this.rNorm * 0.35 / 24]
@@ -272,6 +273,7 @@ class MatterApp {
       if (slug) {
         this.embassies.forEach((embassy) => {
           if (embassy.slug == slug) {
+            this.currentEmbassy = slug
             let index = Math.floor(Math.random() * 4)
             while (index == this.currentBlob) {
               index = Math.floor(Math.random() * 4)
@@ -295,12 +297,13 @@ class MatterApp {
   activate() {
     if (this.currentBlob > -1) {
       this.stop()
+      this.svgRenders[this.currentBlob].blowUpCenter = this.blobs[this.currentBlob].getCenter()
       this.svgRenders[this.currentBlob].blowUp()
       this.destroy()
       let activateEvent = new CustomEvent('activated', {
         detail: {
           message: 'activated',
-          slug: this.embassies[this.currentBlob].slug
+          slug: this.currentEmbassy
         }
       })
       this.wrapper.dispatchEvent(activateEvent)

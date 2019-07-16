@@ -5,6 +5,8 @@ class SVGRender {
     this.wrapper = wrapper
     this.blob = blob
     this.blowUpPositions = []
+    this.blowUpTicker = 0
+    this.blowUpCenter = blob.getCenter()
 
     let model = document.getElementById('blob-model')
 
@@ -33,7 +35,8 @@ class SVGRender {
   }
 
   blowUp() {
-    let center = this.blob.getCenter()
+    this.blowUpTicker++
+
     let points = []
 
     if (this.blowUpPositions.length < 1) {
@@ -45,11 +48,12 @@ class SVGRender {
     }
 
     let isOutside = true
+    let mutliplier = 1 + (this.blowUpTicker * this.blowUpTicker / 20000)
 
     for (let p = 0; p < points.length; p++) {
-      let v = Matter.Vector.sub(center, points[p])
-      v = Matter.Vector.mult(v, 1.1)
-      points[p] = Matter.Vector.add(center, v)
+      let v = Matter.Vector.sub(points[p], this.blowUpCenter)
+      v = Matter.Vector.mult(v, mutliplier)
+      points[p] = Matter.Vector.add(this.blowUpCenter, v)
 
       if (this.isInsideWrapper(points[p])) {
         isOutside = false

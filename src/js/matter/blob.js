@@ -149,7 +149,7 @@ class Blob {
       case 0:
         // init state
         this.destScale = this.restScale
-        if (this.currScale < (this.restScale - 0.01)) {
+        if (this.currScale < (this.restScale - 0.1)) {
           this.grow()
         } else {
           this.springs.forEach((spring) => {
@@ -183,16 +183,16 @@ class Blob {
         break
       case 20:
         // grow state
-        if (this.currScale < (this.destScale - 0.01)) {
-          this.grow(1000)
+        if (this.currScale < (this.destScale - 0.1)) {
+          this.grow(300)
         } else {
           this.state = 1
         }
         break
       case 21:
         // shrink state
-        if (this.currScale > (this.destScale + 0.01)) {
-          this.shrink(1000)
+        if (this.currScale > (this.destScale + 0.1)) {
+          this.shrink(500)
         } else {
           this.state = 1
         }
@@ -253,21 +253,22 @@ class Blob {
     this.scaleTo(this.restScale)
   }
 
-  grow(strength = 400) {
+  grow(strength = 250) {
     // let amount = strength
     let diff = this.destScale - this.currScale
     let amount = 1 + (diff / strength)
 
-
+    amount = amount < 1.00125 ? 1.00125 : amount
     this.scale(amount)
   }
 
-  shrink(strength = 400) {
+  shrink(strength = 250) {
     // let amount = 1 / strength
 
     let diff = this.destScale - this.currScale
     let amount = 1 + (diff / strength)
 
+    amount = amount > 0.99875 ? 0.99875 : amount
     this.scale(amount)
   }
 
