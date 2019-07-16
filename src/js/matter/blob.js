@@ -193,7 +193,7 @@ class Blob {
       case 20:
         // grow state
         if (this.currScale < (this.destScale - 0.1)) {
-          this.grow(300)
+          this.grow(100)
         } else {
           this.state = 1
         }
@@ -281,27 +281,6 @@ class Blob {
     this.scale(amount)
   }
 
-  // moveTo(position) {
-  //   let strength = 0.01
-  //   let offset = Matter.Vector.sub(this.getCenter(), position)
-  //   let force = Matter.Vector.mult(
-  //     Matter.Vector.normalise(offset),
-  //     strength
-  //   )
-  //   Matter.Body.applyForce(this.anchor, Matter.Vector.create(), force)
-  // }
-
-  // addForce(point, strength = 0.002) {
-  //   this.bodies.forEach((body) => {
-  //     let distance = Matter.Vector.sub(body.position, point)
-  //     let force = Matter.Vector.mult(
-  //       Matter.Vector.normalise(distance),
-  //       strength
-  //     )
-  //     Matter.Body.applyForce(body, Matter.Vector.create(), force)
-  //   })
-  // }
-
   rotate() {
     if (this.targetRotation > this.currRotation) {
       let distance = Matter.Vector.sub(this.anchor.position, this.dishOrigin)
@@ -351,8 +330,6 @@ class Blob {
       let offset = Matter.Vector.magnitude(distance)
       
       if (offset > this.dishSize) {
-        console.log('keep ' + this.dishSize)
-        console.log('offset ' + offset)
         let direction = Matter.Vector.normalise(distance)
         let newPosition = Matter.Vector.mult(direction, (this.dishSize - 10))
         Matter.Body.setPosition(body, newPosition)

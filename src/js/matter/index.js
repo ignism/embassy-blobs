@@ -461,14 +461,11 @@ class MatterApp {
 
   rotate() {
     let direction = (Math.random() > 0.5)
-    console.log(direction)
     this.blobs.forEach(blob => {
       blob.dirRotation = direction
       blob.currRotation = 0;
       blob.targetRotation = 400;
       blob.isRotating = true;
-
-      console.log(blob.state)
     })
   }
 
