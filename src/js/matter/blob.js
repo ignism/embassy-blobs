@@ -9,8 +9,8 @@ let Smoothed = function(current, dest, smoothing) {
 class Blob {
   constructor(position, num, restScale, dishSize, dishOrigin) {
     this.position = position
-    this.num = num
-    this.size = 2.75
+    this.num = 16
+    this.size = 4.2
     this.radius = restScale * 24
     this.currScale = 1
     this.destScale = 1
@@ -42,7 +42,7 @@ class Blob {
     }
 
     let circumConstraint = {
-      stiffness: 0.025,
+      stiffness: 0.125,
       damping: 0.1
     }
 
@@ -55,7 +55,7 @@ class Blob {
       this.position.x,
       this.position.y,
       12,
-      initSize * 4,
+      initSize * 3,
       frictionOptions
     )
 
