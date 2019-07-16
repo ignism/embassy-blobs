@@ -9,8 +9,8 @@ let Smoothed = function(current, dest, smoothing) {
 class Blob {
   constructor(position, num, restScale, dishSize, dishOrigin) {
     this.position = position
-    this.num = 16
-    this.size = 4.2
+    this.num = 20
+    this.size = 3.75
     this.radius = restScale * 24
     this.currScale = 1
     this.destScale = 1
