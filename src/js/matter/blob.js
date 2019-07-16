@@ -22,6 +22,10 @@ class Blob {
     this.anchor
     this.dishSize = dishSize
     this.dishOrigin = dishOrigin
+    this.isRotating = false
+    this.dirRotation = false
+    this.currRotation = 0
+    this.targetRotation = 0
   }
 
   init() {
@@ -30,9 +34,9 @@ class Blob {
     let initRadius = 24 * this.currScale
 
     let frictionOptions = {
-      friction: 0.8,
-      frictionAir: 0.1,
-      frictionStatic: 0.1,
+      friction: 0.08,
+      frictionAir: 0.01,
+      frictionStatic: 0.01,
       density: 0.1,
       restitution: 0
     }
@@ -157,6 +161,9 @@ class Blob {
         break
       case 1:
         // rest state
+        if (this.isRotating) {
+          this.rotate()
+        }
         break
       case 10:
         // reset state
@@ -176,7 +183,7 @@ class Blob {
         break
       case 20:
         // grow state
-        if (this.currScale < this.destScale) {
+        if (this.currScale < (this.destScale - 0.01)) {
           this.grow(400)
         } else {
           this.state = 1
@@ -184,7 +191,7 @@ class Blob {
         break
       case 21:
         // shrink state
-        if (this.currScale > this.destScale) {
+        if (this.currScale > (this.destScale + 0.01)) {
           this.shrink(600)
         } else {
           this.state = 1
@@ -284,6 +291,25 @@ class Blob {
   //     Matter.Body.applyForce(body, Matter.Vector.create(), force)
   //   })
   // }
+
+  rotate() {
+    if (this.targetRotation > this.currRotation) {
+      let distance = Matter.Vector.sub(this.anchor.position, this.dishOrigin)
+      let direction = Matter.Vector.normalise(distance)
+      let perpendicular = Matter.Vector.rotate(direction, (Math.PI / 2) * (1 + -2 * this.dirRotation))
+      let increment = Matter.Vector.mult(perpendicular, 2)
+      
+      let newPosition = Matter.Vector.add(this.anchor.position, increment)
+
+      Matter.Body.setPosition(this.anchor, newPosition)
+      
+      this.currRotation++
+    } else {
+      this.isRotating = false
+      this.targetRotation = 0
+      this.currRotation = 0
+    }
+  }
 
   addMovement(center, strength) {
     let norm = Matter.Vector.normalise(

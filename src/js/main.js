@@ -54,8 +54,7 @@ wrapper.addEventListener('mouseover', (event) => {
 
 // debug
 wrapper.addEventListener('click', (event) => {
-  console.log(event.detail)
-  matterApp.randomizeScales()
+  matterApp.rotate()
 })
 
 

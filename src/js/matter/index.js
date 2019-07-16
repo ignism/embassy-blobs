@@ -35,6 +35,8 @@ class MatterApp {
     this.isRunning = true
     this.throttledResize = throttle(this.resize.bind(this), 200)
     this.throttledMousemove = throttle(this.mousemove.bind(this), 200)
+    this.rotationTrigger = 400
+    this.rotationTicker = 0
     this.throttleFPS = {
       fps: 0,
       fpsInterval: 0,
@@ -375,6 +377,13 @@ class MatterApp {
     this.dishOuter.update()
 
     Matter.Engine.update(engine)
+
+    this.rotationTicker++
+    if (this.rotationTicker > this.rotationTrigger) {
+      this.rotationTrigger = Math.floor(Math.random() * 4) * 100 + 200
+      this.rotationTicker = 0
+      this.rotate()
+    }
   }
 
   draw() {
@@ -445,6 +454,19 @@ class MatterApp {
         blob.scaleTo(randomScales[key])
       })
     }
+  }
+
+  rotate() {
+    let direction = (Math.random() > 0.5)
+    console.log(direction)
+    this.blobs.forEach(blob => {
+      blob.dirRotation = direction
+      blob.currRotation = 0;
+      blob.targetRotation = 400;
+      blob.isRotating = true;
+
+      console.log(blob.state)
+    })
   }
 
   scaleBlob(index, amount) {

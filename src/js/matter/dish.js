@@ -8,6 +8,7 @@ class Dish {
     this.radius = radius
     this.targetRadius = radius
     this.bodies = []
+    this.ticker = 0
   }
 
   init() {
@@ -81,6 +82,8 @@ class Dish {
     } else {
       this.targetRadius = this.radius
     }
+
+    // this.rotate()
   }
 
   getCenter() {
@@ -117,6 +120,27 @@ class Dish {
     //   Matter.Body.setPosition(body, Matter.Vector.add(this.position, offset))
     // })
     this.targetRadius = radius
+  }
+
+  rotate() {
+    let rotationSteps = 1000
+    this.ticker++
+    this.ticker = this.ticker % rotationSteps
+    let angleIncrement = (this.ticker * Math.PI * 2) / rotationSteps
+    let segment = Math.PI * 2 / this.num
+
+    for (let i = 0; i < this.num; i++) {
+      let angle = (i * segment) + angleIncrement
+      let offset = {
+        x: Math.cos(angle) * this.radius,
+        y: Math.sin(angle) * this.radius
+      }
+      let x = this.position.x + offset.x
+      let y = this.position.y + offset.y
+      
+      Matter.Body.setAngle(this.bodies[i], angle + (Math.PI / 2))
+      Matter.Body.setPosition(this.bodies[i], Matter.Vector.create(x, y))
+    }
   }
 
   addToWorld(world) {
