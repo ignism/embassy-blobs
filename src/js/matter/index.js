@@ -19,7 +19,7 @@ class MatterApp {
     this.dish = new Dish(this.dishOrigin, 24, this.dishSize)
     this.dishOuter = new Dish(this.dishOrigin, 24, this.dishSize + 4)
     this.numBlobs = numBlobs
-    this.rNorm = this.dishSize * 0.55
+    this.rNorm = this.dishSize * 0.525
     this.blobRadi = [this.rNorm * 1, this.rNorm * 0.8, this.rNorm * 0.7, this.rNorm * 0.5]
     this.blobScales = [this.rNorm * 1 / 24, this.rNorm * 0.8 / 24, this.rNorm * 0.7 / 24, this.rNorm * 0.5 / 24]
     this.highlightScales = [this.rNorm * 1.25 / 24, this.rNorm * 0.65 / 24, this.rNorm * 0.55 / 24, this.rNorm * 0.35 / 24]

@@ -18,6 +18,7 @@ class Blob {
     this.restScale = restScale
     this.bodies = []
     this.springs = []
+    this.anchorSprings = []
     this.state = 0
     this.anchor
     this.dishSize = dishSize
@@ -47,8 +48,8 @@ class Blob {
     }
 
     let anchorConstraint = {
-      stiffness: 0.00125,
-      damping: 0.001
+      stiffness: 0.0125,
+      damping: 0.000001
     }
 
     this.anchor = Matter.Bodies.polygon(
@@ -129,6 +130,7 @@ class Blob {
       this.springs.push(springAB)
       this.springs.push(springAC)
       this.springs.push(springAnchorA)
+      this.anchorSprings.push(springAnchorA)
     }
   }
 
@@ -152,9 +154,16 @@ class Blob {
         if (this.currScale < (this.restScale - 0.1)) {
           this.grow()
         } else {
+
+          this.anchorSprings.forEach((spring) => {
+            spring.constraint.stiffness = 0.0025
+            spring.constraint.damping = 0.1
+          })
           this.springs.forEach((spring) => {
             spring.restLength = spring.constraint.length
+            // console.log(spring.constraint.stiffness = 0.9)
           })
+
 
           this.state++
         }
@@ -253,7 +262,7 @@ class Blob {
     this.scaleTo(this.restScale)
   }
 
-  grow(strength = 250) {
+  grow(strength = 100) {
     // let amount = strength
     let diff = this.destScale - this.currScale
     let amount = 1 + (diff / strength)
@@ -262,7 +271,7 @@ class Blob {
     this.scale(amount)
   }
 
-  shrink(strength = 250) {
+  shrink(strength = 100) {
     // let amount = 1 / strength
 
     let diff = this.destScale - this.currScale
