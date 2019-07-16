@@ -35,7 +35,7 @@ const patterns = [
 ]
 
 const wrapper = document.getElementById('blob-app')
-const matterApp = new MatterApp(wrapper, embassies, patterns, 4, false)
+const matterApp = new MatterApp(wrapper, embassies, patterns, 4, true)
 const embassyDetail = document.querySelector('.embassy-detail')
 const buttonBack = embassyDetail.querySelector('.button-back')
 const buttonActivate = embassyDetail.querySelector('.button-activate')

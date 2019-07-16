@@ -10,7 +10,7 @@ class Blob {
   constructor(position, num, restScale, dishSize, dishOrigin) {
     this.position = position
     this.num = 20
-    this.size = 3.75
+    this.size = 3.5
     this.radius = restScale * 24
     this.currScale = 1
     this.destScale = 1
@@ -27,6 +27,7 @@ class Blob {
     this.dirRotation = false
     this.currRotation = 0
     this.targetRotation = 0
+    this.isTight = true
   }
 
   init() {
@@ -156,14 +157,11 @@ class Blob {
         } else {
 
           this.anchorSprings.forEach((spring) => {
-            spring.constraint.stiffness = 0.0025
-            spring.constraint.damping = 0.1
+            spring.constraint.damping = 0.5
           })
           this.springs.forEach((spring) => {
             spring.restLength = spring.constraint.length
-            // console.log(spring.constraint.stiffness = 0.9)
           })
-
 
           this.state++
         }
@@ -173,10 +171,13 @@ class Blob {
         if (this.isRotating) {
           this.rotate()
         }
+
+        if (this.isTight) this.loosen()
         break
       case 10:
         // reset state
         this.destScale = this.restScale
+        if (this.isTight == false) this.tighten()
 
         if (this.currScale < this.destScale) {
           this.grow()
@@ -193,16 +194,20 @@ class Blob {
       case 20:
         // grow state
         if (this.currScale < (this.destScale - 0.1)) {
+          if (this.isTight == false) this.tighten()
           this.grow(300)
         } else {
+
           this.state = 1
         }
         break
       case 21:
         // shrink state
         if (this.currScale > (this.destScale + 0.1)) {
+          if (this.isTight == false) this.tighten()
           this.shrink(500)
         } else {
+
           this.state = 1
         }
         break
@@ -218,6 +223,22 @@ class Blob {
     } else {
       this.state = 21
     }
+  }
+
+  tighten() {
+    this.isTight = true
+    this.anchorSprings.forEach((spring) => {
+      spring.constraint.stiffness = 0.00125
+      spring.constraint.damping = 0.001
+    })
+  }
+
+  loosen() {
+    this.isTight = false
+    this.anchorSprings.forEach((spring) => {
+      spring.constraint.stiffness = 0.000125
+      spring.constraint.damping = 0.01
+    })
   }
 
   getCenter() {
@@ -307,7 +328,9 @@ class Blob {
       let distance = Matter.Vector.sub(this.anchor.position, this.dishOrigin)
       let direction = Matter.Vector.normalise(distance)
       let perpendicular = Matter.Vector.rotate(direction, (Math.PI / 2) * (1 + -2 * this.dirRotation))
-      let increment = Matter.Vector.mult(perpendicular, 2)
+      let multiplier = (this.currRotation / this.targetRotation) * 16
+      multiplier = multiplier > 8 ? 8 : multiplier
+      let increment = Matter.Vector.mult(perpendicular, multiplier)
       
       let newPosition = Matter.Vector.add(this.anchor.position, increment)
 
@@ -351,8 +374,6 @@ class Blob {
       let offset = Matter.Vector.magnitude(distance)
       
       if (offset > this.dishSize) {
-        console.log('keep ' + this.dishSize)
-        console.log('offset ' + offset)
         let direction = Matter.Vector.normalise(distance)
         let newPosition = Matter.Vector.mult(direction, (this.dishSize - 10))
         Matter.Body.setPosition(body, newPosition)
