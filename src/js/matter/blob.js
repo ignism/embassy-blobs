@@ -34,9 +34,9 @@ class Blob {
     let initRadius = 24 * this.currScale
 
     let frictionOptions = {
-      friction: 0.08,
+      friction: 0.008,
       frictionAir: 0.125,
-      frictionStatic: 0.01,
+      frictionStatic: 0.001,
       density: 0.1,
       restitution: 0
     }
@@ -48,7 +48,7 @@ class Blob {
 
     let anchorConstraint = {
       stiffness: 0.00125,
-      damping: 0.001
+      damping: 0.01
     }
 
     this.anchor = Matter.Bodies.polygon(
