@@ -184,7 +184,7 @@ class Blob {
       case 20:
         // grow state
         if (this.currScale < (this.destScale - 0.01)) {
-          this.grow(1000)
+          this.grow(600)
         } else {
           this.state = 1
         }
@@ -192,7 +192,7 @@ class Blob {
       case 21:
         // shrink state
         if (this.currScale > (this.destScale + 0.01)) {
-          this.shrink(1000)
+          this.shrink(400)
         } else {
           this.state = 1
         }
@@ -253,7 +253,7 @@ class Blob {
     this.scaleTo(this.restScale)
   }
 
-  grow(strength = 400) {
+  grow(strength = 200) {
     // let amount = strength
     let diff = this.destScale - this.currScale
     let amount = 1 + (diff / strength)
@@ -262,7 +262,7 @@ class Blob {
     this.scale(amount)
   }
 
-  shrink(strength = 400) {
+  shrink(strength = 200) {
     // let amount = 1 / strength
 
     let diff = this.destScale - this.currScale
