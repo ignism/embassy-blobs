@@ -35,7 +35,7 @@ class Blob {
 
     let frictionOptions = {
       friction: 0.08,
-      frictionAir: 0.01,
+      frictionAir: 0.25,
       frictionStatic: 0.01,
       density: 0.1,
       restitution: 0
@@ -47,7 +47,7 @@ class Blob {
     }
 
     let anchorConstraint = {
-      stiffness: 0.000125,
+      stiffness: 0.00125,
       damping: 0.001
     }
 
