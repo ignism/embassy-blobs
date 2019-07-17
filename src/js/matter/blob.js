@@ -302,12 +302,33 @@ class Blob {
   //   })
   // }
 
+  // rotate() {
+  //   if (this.targetRotation > this.currRotation) {
+  //     let distance = Matter.Vector.sub(this.anchor.position, this.dishOrigin)
+  //     let direction = Matter.Vector.normalise(distance)
+  //     let perpendicular = Matter.Vector.rotate(direction, (Math.PI / 2) * (1 + -2 * this.dirRotation))
+  //     let increment = Matter.Vector.mult(perpendicular, 2)
+      
+  //     let newPosition = Matter.Vector.add(this.anchor.position, increment)
+
+  //     Matter.Body.setPosition(this.anchor, newPosition)
+      
+  //     this.currRotation++
+  //   } else {
+  //     this.isRotating = false
+  //     this.targetRotation = 0
+  //     this.currRotation = 0
+  //   }
+  // }
+
   rotate() {
     if (this.targetRotation > this.currRotation) {
       let distance = Matter.Vector.sub(this.anchor.position, this.dishOrigin)
       let direction = Matter.Vector.normalise(distance)
       let perpendicular = Matter.Vector.rotate(direction, (Math.PI / 2) * (1 + -2 * this.dirRotation))
-      let increment = Matter.Vector.mult(perpendicular, 2)
+      let multiplier = (this.currRotation / this.targetRotation) * 16
+      multiplier = multiplier > 2 ? 2 : multiplier
+      let increment = Matter.Vector.mult(perpendicular, multiplier)
       
       let newPosition = Matter.Vector.add(this.anchor.position, increment)
 
