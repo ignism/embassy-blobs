@@ -193,7 +193,7 @@ class Blob {
       case 20:
         // grow state
         if (this.currScale < (this.destScale - 0.1)) {
-          this.grow(300)
+          this.grow(400)
         } else {
           this.state = 1
         }
@@ -201,7 +201,7 @@ class Blob {
       case 21:
         // shrink state
         if (this.currScale > (this.destScale + 0.1)) {
-          this.shrink(500)
+          this.shrink(400)
         } else {
           this.state = 1
         }

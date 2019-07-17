@@ -22,7 +22,7 @@ class MatterApp {
     this.rNorm = this.dishSize * 0.525
     this.blobRadi = [this.rNorm * 1, this.rNorm * 0.8, this.rNorm * 0.7, this.rNorm * 0.5]
     this.blobScales = [this.rNorm * 1 / 24, this.rNorm * 0.8 / 24, this.rNorm * 0.7 / 24, this.rNorm * 0.5 / 24]
-    this.highlightScales = [this.rNorm * 1.25 / 24, this.rNorm * 0.65 / 24, this.rNorm * 0.55 / 24, this.rNorm * 0.35 / 24]
+    this.highlightScales = [this.rNorm * 1.35 / 24, this.rNorm * 0.6 / 24, this.rNorm * 0.5 / 24, this.rNorm * 0.35 / 24]
     this.blobs = []
     this.overblob = -1
     this.svgRenders = []
@@ -36,7 +36,7 @@ class MatterApp {
     this.isRunning = true
     this.throttledResize = throttle(this.resize.bind(this), 200)
     this.throttledMousemove = throttle(this.mousemove.bind(this), 200)
-    this.rotationTrigger = 400
+    this.rotationTrigger = 100
     this.rotationTicker = 0
     this.throttleFPS = {
       fps: 0,
@@ -460,15 +460,15 @@ class MatterApp {
   }
 
   rotate() {
-    let direction = (Math.random() > 0.5)
-    console.log(direction)
+    this.rotationTrigger = Math.floor(Math.random() * 4) * 800 + 800
+    this.rotationTicker = 0
+
+    let direction = !this.blobs[0].dirRotation
     this.blobs.forEach(blob => {
       blob.dirRotation = direction
       blob.currRotation = 0;
-      blob.targetRotation = 400;
+      blob.targetRotation = this.rotationTrigger;
       blob.isRotating = true;
-
-      console.log(blob.state)
     })
   }
 
