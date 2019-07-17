@@ -27,6 +27,7 @@ class Blob {
     this.dirRotation = false
     this.currRotation = 0
     this.targetRotation = 0
+    this.isTight = false
   }
 
   init() {
@@ -69,7 +70,7 @@ class Blob {
 
       let x = this.position.x + offset.x
       let y = this.position.y + offset.y
-      let circle = Matter.Bodies.polygon(x, y, 12, initSize, frictionOptions)
+      let circle = Matter.Bodies.polygon(x, y, 48, initSize, frictionOptions)
 
       this.bodies.push(circle)
     }
@@ -172,6 +173,10 @@ class Blob {
         if (this.isRotating) {
           this.rotate()
         }
+
+        
+        this.loosen()
+
         break
       case 10:
         // reset state
@@ -280,6 +285,21 @@ class Blob {
     this.scale(amount)
   }
 
+  tighten() {
+    this.isTight = true
+    this.anchorSprings.forEach((spring) => {
+      spring.constraint.stiffness = 0.0125
+      spring.constraint.damping = 0.001
+    })
+  }
+  loosen() {
+    this.isTight = false
+    this.anchorSprings.forEach((spring) => {
+      spring.constraint.stiffness = 0.00125
+      spring.constraint.damping = 0.1
+    })
+  }
+
   // moveTo(position) {
   //   let strength = 0.01
   //   let offset = Matter.Vector.sub(this.getCenter(), position)
@@ -325,8 +345,8 @@ class Blob {
       let distance = Matter.Vector.sub(this.anchor.position, this.dishOrigin)
       let direction = Matter.Vector.normalise(distance)
       let perpendicular = Matter.Vector.rotate(direction, (Math.PI / 2) * (1 + -2 * this.dirRotation))
-      let multiplier = (this.currRotation / this.targetRotation) * 16
-      multiplier = multiplier > 2 ? 2 : multiplier
+      let multiplier = (this.currRotation / this.targetRotation) * 4
+      multiplier = multiplier > 1 ? 1 : multiplier
       let increment = Matter.Vector.mult(perpendicular, multiplier)
       
       let newPosition = Matter.Vector.add(this.anchor.position, increment)
