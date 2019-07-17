@@ -262,22 +262,22 @@ class Blob {
     this.scaleTo(this.restScale)
   }
 
-  grow(strength = 100) {
+  grow(strength = 200) {
     // let amount = strength
     let diff = this.destScale - this.currScale
     let amount = 1 + (diff / strength)
 
-    amount = amount < 1.00125 ? 1.00125 : amount
+    amount = amount < 1.000625 ? 1.000625 : amount
     this.scale(amount)
   }
 
-  shrink(strength = 100) {
+  shrink(strength = 200) {
     // let amount = 1 / strength
 
     let diff = this.destScale - this.currScale
     let amount = 1 + (diff / strength)
 
-    amount = amount > 0.99875 ? 0.99875 : amount
+    amount = amount > 0.999375 ? 0.999375 : amount
     this.scale(amount)
   }
 
