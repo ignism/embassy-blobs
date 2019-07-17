@@ -29,6 +29,7 @@ class MatterApp {
     this.debug = debug
     this.blobsInitialized = false
     this.initialized = false
+    this.isHighlighted = false
     // this.ticker = 0
     this.isScaling = false
     this.currentBlob = -1
@@ -226,7 +227,10 @@ class MatterApp {
       this.blobs.forEach((blob, key) => {
         if (blob.isInside(mouse)) {
           if (key != this.overblob) {
-            this.randomizeScales(key)
+            if (this.isHighlighted == false) 
+            { 
+              this.randomizeScales(key)
+            }
 
             let mouseoverEvent = new CustomEvent('mouseover', {
               detail: {
@@ -260,10 +264,13 @@ class MatterApp {
     this.svgRenders.forEach((svgRender) => {
       svgRender.reset()
     })
+
+    this.isHighlighted = false
+    this.currentBlob = -1
   }
 
   hover() {
-    if (this.initialized) {
+    if (this.initialized && this.isHighlighted == false) {
       this.randomizeScales()
     }
   }
@@ -274,20 +281,21 @@ class MatterApp {
         this.embassies.forEach((embassy) => {
           if (embassy.slug == slug) {
             this.currentEmbassy = slug
-            let index = Math.floor(Math.random() * 4)
-            while (index == this.currentBlob) {
+            let index = this.currentBlob
+            if (index == -1) {
               index = Math.floor(Math.random() * 4)
             }
-
-            // let scale = this.dishSize / 24 * 0.65
-            // this.scaleBlob(index, scale)
+            // let index = Math.floor(Math.random() * 4)
+            // while (index == this.currentBlob) {
+            //   index = Math.floor(Math.random() * 4)
+            // }
 
             this.highlightBlob(index)
             this.setBlobBackground(index, embassy.image)
             this.currentBlob = index
           }
         })
-
+        this.isHighlighted = true
         return true
       }
     }
@@ -412,6 +420,10 @@ class MatterApp {
 
       this.blobs.forEach((blob, key) => {
         blob.scaleTo(randomScales[key])
+
+        if (this.blobScales[0] == randomScales[key]) {
+          this.currentBlob = key
+        }
       })
     } else {
       for (let i = 1; i < this.blobScales.length; i++) {
@@ -431,6 +443,8 @@ class MatterApp {
       this.blobs.forEach((blob, key) => {
         blob.scaleTo(randomScales[key])
       })
+
+      this.currentBlob = index
     }
   }
 

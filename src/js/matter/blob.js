@@ -161,7 +161,6 @@ class Blob {
           })
           this.springs.forEach((spring) => {
             spring.restLength = spring.constraint.length
-            // console.log(spring.constraint.stiffness = 0.9)
           })
 
 
@@ -372,8 +371,6 @@ class Blob {
       let offset = Matter.Vector.magnitude(distance)
       
       if (offset > this.dishSize) {
-        console.log('keep ' + this.dishSize)
-        console.log('offset ' + offset)
         let direction = Matter.Vector.normalise(distance)
         let newPosition = Matter.Vector.mult(direction, (this.dishSize - 10))
         Matter.Body.setPosition(body, newPosition)

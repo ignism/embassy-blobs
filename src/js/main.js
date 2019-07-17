@@ -52,11 +52,6 @@ wrapper.addEventListener('mouseover', (event) => {
   console.log(event.detail)
 })
 
-// debug
-wrapper.addEventListener('click', (event) => {
-  matterApp.rotate()
-})
-
 
 buttonBack.addEventListener('click', (event) => {
   event.preventDefault()
