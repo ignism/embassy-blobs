@@ -155,7 +155,7 @@ class Blob {
         this.destScale = this.restScale
         if (this.currScale < (this.restScale - 0.1)) {
           this.grow(100)
-          if (this.currScale / this.restScale > 0.75) {
+          if (this.currScale / this.restScale > 0.5) {
             this.initialized = true
           }
         } else {
@@ -290,18 +290,18 @@ class Blob {
 
   tighten() {
     this.isTight = true
-    this.anchorSprings.forEach((spring) => {
-      spring.constraint.stiffness = 0.0125
-      spring.constraint.damping = 0.001
-    })
+    // this.anchorSprings.forEach((spring) => {
+    //   spring.constraint.stiffness = 0.0125
+    //   spring.constraint.damping = 0.001
+    // })
   }
 
   loosen() {
     this.isTight = false
-    this.anchorSprings.forEach((spring) => {
-      spring.constraint.stiffness = 0.00125
-      spring.constraint.damping = 0.1
-    })
+    // this.anchorSprings.forEach((spring) => {
+    //   spring.constraint.stiffness = 0.00125
+    //   spring.constraint.damping = 0.1
+    // })
   }
 
   // moveTo(position) {
