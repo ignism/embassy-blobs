@@ -290,18 +290,18 @@ class Blob {
 
   tighten() {
     this.isTight = true
-    // this.anchorSprings.forEach((spring) => {
-    //   spring.constraint.stiffness = 0.0125
-    //   spring.constraint.damping = 0.001
-    // })
+    this.anchorSprings.forEach((spring) => {
+      spring.constraint.stiffness = 0.0125
+      spring.constraint.damping = 0.001
+    })
   }
 
   loosen() {
     this.isTight = false
-    // this.anchorSprings.forEach((spring) => {
-    //   spring.constraint.stiffness = 0.00125
-    //   spring.constraint.damping = 0.1
-    // })
+    this.anchorSprings.forEach((spring) => {
+      spring.constraint.stiffness = 0.00125
+      spring.constraint.damping = 0.1
+    })
   }
 
   // moveTo(position) {
