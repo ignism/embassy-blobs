@@ -28,6 +28,7 @@ class Blob {
     this.currRotation = 0
     this.targetRotation = 0
     this.isTight = false
+    this.initialized = false
   }
 
   init() {
@@ -153,7 +154,10 @@ class Blob {
         // init state
         this.destScale = this.restScale
         if (this.currScale < (this.restScale - 0.1)) {
-          this.grow()
+          this.grow(100)
+          if (this.currScale / this.restScale > 0.75) {
+            this.initialized = true
+          }
         } else {
 
           this.anchorSprings.forEach((spring) => {
@@ -163,7 +167,6 @@ class Blob {
           this.springs.forEach((spring) => {
             spring.restLength = spring.constraint.length
           })
-
 
           this.state++
         }
@@ -292,6 +295,7 @@ class Blob {
       spring.constraint.damping = 0.001
     })
   }
+
   loosen() {
     this.isTight = false
     this.anchorSprings.forEach((spring) => {

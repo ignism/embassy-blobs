@@ -355,8 +355,9 @@ class MatterApp {
   update() {
     if (!this.initialized) {
       if (
-        this.blobsInitialized &&
-        this.preloadedImages === this.embassies.length
+        this.blobsInitialized 
+        // &&
+        // this.preloadedImages === this.embassies.length
       ) {
         this.initialized = true
         // this.wrapper.querySelector('#blob-svg-wrapper').style.opacity = 1
@@ -376,7 +377,7 @@ class MatterApp {
     } else {
       let initialized = true
       this.blobs.forEach((blob) => {
-        if (blob.state != 1) {
+        if (!blob.initialized) {
           initialized = false
         }
         blob.update()
