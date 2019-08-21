@@ -195,8 +195,8 @@ class MatterApp {
       this.dishOuter.moveTo(dishOrigin)
 
       this.dishSize = dishSize
-      this.rNorm = this.dishSize * 0.6
-      this.blobScales = [this.rNorm * 1 / 24, this.rNorm * 0.8 / 24, this.rNorm * 0.7 / 24, this.rNorm * 0.5 / 24]
+      this.rNorm = this.dishSize * 0.525
+      this.blobScales = [this.rNorm * .95 / 24, this.rNorm * 0.8 / 24, this.rNorm * 0.75 / 24, this.rNorm * 0.5 / 24]
 
       // let dishScale = this.dishSize / this.dish.radius
       // let blobScale = 1 + (dishScale - 1) * 0.66667

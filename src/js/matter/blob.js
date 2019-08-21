@@ -304,46 +304,6 @@ class Blob {
     })
   }
 
-  // moveTo(position) {
-  //   let strength = 0.01
-  //   let offset = Matter.Vector.sub(this.getCenter(), position)
-  //   let force = Matter.Vector.mult(
-  //     Matter.Vector.normalise(offset),
-  //     strength
-  //   )
-  //   Matter.Body.applyForce(this.anchor, Matter.Vector.create(), force)
-  // }
-
-  // addForce(point, strength = 0.002) {
-  //   this.bodies.forEach((body) => {
-  //     let distance = Matter.Vector.sub(body.position, point)
-  //     let force = Matter.Vector.mult(
-  //       Matter.Vector.normalise(distance),
-  //       strength
-  //     )
-  //     Matter.Body.applyForce(body, Matter.Vector.create(), force)
-  //   })
-  // }
-
-  // rotate() {
-  //   if (this.targetRotation > this.currRotation) {
-  //     let distance = Matter.Vector.sub(this.anchor.position, this.dishOrigin)
-  //     let direction = Matter.Vector.normalise(distance)
-  //     let perpendicular = Matter.Vector.rotate(direction, (Math.PI / 2) * (1 + -2 * this.dirRotation))
-  //     let increment = Matter.Vector.mult(perpendicular, 2)
-      
-  //     let newPosition = Matter.Vector.add(this.anchor.position, increment)
-
-  //     Matter.Body.setPosition(this.anchor, newPosition)
-      
-  //     this.currRotation++
-  //   } else {
-  //     this.isRotating = false
-  //     this.targetRotation = 0
-  //     this.currRotation = 0
-  //   }
-  // }
-
   rotate() {
     if (this.targetRotation > this.currRotation) {
       let distance = Matter.Vector.sub(this.anchor.position, this.dishOrigin)
