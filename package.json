@@ -51,7 +51,7 @@
   "dependencies": {
     "@babel/polyfill": "^7.4.4",
     "classlist-polyfill": "^1.2.0",
-    "lodash-es": "^4.17.11",
+    "lodash-es": "^4.17.21",
     "matter-js": "^0.14.2",
     "point-in-polygon": "^1.0.1"
   }
